@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://athenasconstrutora.com.br/sitemap.xml
+
+# Crawl-delay (opcional)
+Crawl-delay: 1
