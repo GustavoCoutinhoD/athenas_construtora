@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 3)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 5)",
+      "PowerShell(Start-Process powershell -ArgumentList \"-NoProfile -Command `\"cd 'C:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Athenas\\\\athenas'; python -m http.server 3000`\"\" -WindowStyle Normal)",
+      "PowerShell(Start-Process \"http://localhost:3000\")",
+      "PowerShell(ls \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Athenas\\\\athenas\\\\\")"
+    ]
+  }
+}

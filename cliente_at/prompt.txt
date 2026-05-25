@@ -1,0 +1,272 @@
+# Tesla Style Premium Interactive Section
+
+## Context
+
+Você é um desenvolvedor FRONT-END SÊNIOR especialista em experiências premium, animações cinematográficas e interfaces de alto padrão.
+
+Sua tarefa é implementar UMA SEÇÃO COMPLETA inspirada na estética da Tesla Landing Page mostrada nas referências anexadas.
+
+A implementação deve ficar extremamente sofisticada, moderna, tecnológica e altamente interativa.
+
+---
+
+# Objetivo
+
+Criar uma seção premium com:
+
+- aparência futurista
+- visual cinematográfico
+- animações suaves
+- transições refinadas
+- navegação interativa
+- troca dinâmica de conteúdo
+- experiência high-end
+
+A seção deve transmitir sensação de produto milionário.
+
+---
+
+# Estrutura da Seção
+
+## Layout Principal
+
+Criar estrutura horizontal contendo:
+
+### Esquerda
+Conteúdo textual:
+- título grande
+- subtítulo
+- descrição curta
+- botão CTA premium
+
+### Centro
+Imagem principal:
+- veículo
+- empreendimento
+- produto
+- mockup
+- render
+
+A imagem deve ser o destaque visual.
+
+### Direita
+Menu vertical interativo contendo:
+- MODEL S
+- MODEL X
+- MODEL 3
+- ROADSTER
+- SEMI TRUCK
+
+Ao clicar:
+- trocar imagem
+- trocar título
+- trocar descrição
+- trocar métricas
+- trocar cor do glow
+- ativar animações suaves
+
+---
+
+# Estilo Visual
+
+## Fundo
+
+Criar background:
+- preto profundo
+- iluminação ambiente
+- glow dinâmico
+- aparência tecnológica premium
+
+Adicionar:
+- gradients escuros
+- blur
+- glow vermelho/azul
+- sombras suaves
+- profundidade visual
+- reflexos sutis
+
+---
+
+# Tipografia
+
+Usar tipografia:
+- elegante
+- moderna
+- minimalista
+- espaçamento refinado
+
+O título principal deve ser:
+- grande
+- forte
+- clean
+- sofisticado
+
+---
+
+# Botão CTA
+
+Criar botão premium contendo:
+- borda glow
+- hover sofisticado
+- animação suave
+- microinterações
+- efeito luminoso
+
+Hover:
+- leve scale
+- glow expandindo
+- transição refinada
+
+---
+
+# Indicadores Inferiores
+
+Adicionar métricas abaixo do conteúdo principal.
+
+Exemplo:
+- +250 mph
+- 1.9s
+- 500 mi
+
+Cada item:
+- número grande
+- label pequena
+- alinhamento elegante
+
+---
+
+# Scroll Indicator
+
+Adicionar indicador animado na parte inferior central da seção.
+
+Animação:
+- movimento vertical suave
+- loop infinito
+- aparência minimalista
+
+---
+
+# Animações Obrigatórias
+
+Implementar:
+- fade reveal
+- smooth transitions
+- scale animation
+- slide transitions
+- blur reveal
+- cinematic reveal
+- hover animations
+- glow pulsando
+- motion transitions
+- opacity transitions
+- parallax leve
+
+Todas as animações devem ser suaves e premium.
+
+Usar easing refinado:
+- cubic-bezier
+- ease-in-out premium
+
+---
+
+# Troca de Conteúdo
+
+Ao trocar os modelos:
+- imagem deve animar
+- textos devem transicionar
+- glow deve mudar
+- métricas devem atualizar
+- navegação lateral deve destacar item ativo
+
+Tudo deve parecer uma apresentação de produto premium.
+
+---
+
+# Responsividade
+
+A seção deve funcionar perfeitamente:
+- desktop
+- tablet
+- mobile
+
+No mobile:
+- reorganizar layout elegantemente
+- manter estética premium
+- preservar animações
+- evitar quebra visual
+
+---
+
+# Tecnologias
+
+Pode utilizar:
+- HTML5
+- CSS3 moderno
+- JavaScript
+- React
+- GSAP
+- Framer Motion
+
+Preferência:
+- performance otimizada
+- código limpo
+- componentização
+- animações fluidas
+
+---
+
+# Qualidade do Código
+
+O código deve ser:
+- limpo
+- organizado
+- escalável
+- profissional
+- componentizado
+- sem código amador
+
+Usar:
+- nomes semânticos
+- estrutura premium
+- boas práticas modernas
+
+---
+
+# Importante
+
+A implementação deve ficar MUITO PRÓXIMA visualmente da referência enviada.
+
+Quero:
+- mesma sensação premium
+- mesma experiência cinematográfica
+- mesma estética Tesla
+- mesma interação sofisticada
+
+Mas adaptada ao conteúdo do meu projeto.
+
+Substitua:
+- veículos
+- textos
+- métricas
+- imagens
+
+pelos dados do meu projeto mantendo o mesmo conceito visual.
+
+---
+
+# Resultado Esperado
+
+A seção final deve parecer:
+- site da Tesla
+- Apple
+- Porsche
+- startup bilionária
+
+Quero um resultado:
+- elegante
+- impactante
+- sofisticado
+- extremamente moderno
+- visualmente impressionante
+
+Implemente tudo dentro da seção específica que eu indicar sem quebrar o restante do layout.
