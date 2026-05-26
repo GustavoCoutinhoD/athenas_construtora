@@ -50,14 +50,14 @@
   <style>
     /* ─── MODO PERFORMANCE (PCs antigos) ───────────────────── */
     /* Adicionado via JS quando hardwareConcurrency <= 4 ou deviceMemory <= 4 */
-    body.perf-mode .lamp-glow-main,
-    body.perf-mode .lamp-beam,
-    body.perf-mode .lamp-cone-left-inner,
-    body.perf-mode .lamp-cone-right-inner,
+    /* Remove só o blur pesado — elementos continuam visíveis */
     body.perf-mode .ts-glow-orb,
     body.perf-mode .ts-img-glow,
     body.perf-mode .cardstack-spotlight-top,
-    body.perf-mode .cardstack-spotlight-bot { filter: none !important; display: none !important; }
+    body.perf-mode .cardstack-spotlight-bot { filter: none !important; }
+
+    body.perf-mode .lamp-glow-main,
+    body.perf-mode .lamp-beam { filter: blur(8px) !important; } /* reduzido de 48px/22px → 8px */
 
     body.perf-mode .pdf-download-card,
     body.perf-mode .galeria-btn { backdrop-filter: none !important; }
