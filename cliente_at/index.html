@@ -4618,10 +4618,31 @@
   }
   </script>
 
+  <!-- ══ Canvas-visibility controller (independente do módulo IFC) ══ -->
+  <script>
+  (function() {
+    function syncCanvas() {
+      var active = document.querySelector('#sobre .ts-nav-item.active');
+      var img    = document.getElementById('ts-main-img');
+      var canvas = document.getElementById('ts-3d-canvas');
+      if (!img || !canvas) return;
+      var isRes = active && parseInt(active.dataset.index) === 0;
+      img.style.display    = isRes ? 'none' : '';
+      canvas.style.display = isRes ? 'block' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      syncCanvas();
+      document.querySelectorAll('#sobre .ts-nav-item').forEach(function(el) {
+        new MutationObserver(syncCanvas).observe(el, { attributes: true, attributeFilter: ['class'] });
+      });
+    });
+  })();
+  </script>
+
   <!-- ══ 3D RESIDENCIAL — IFC via web-ifc-three ════════════════ -->
   <script type="module">
   import * as THREE from 'three';
-  import { IFCLoader } from 'https://esm.sh/web-ifc-three@0.0.136?external=three';
+  /* IFCLoader carregado dinamicamente para não quebrar o módulo se falhar */
 
   /* ── Só inicializa quando a seção entrar na tela ── */
   const _triggerEl = document.getElementById('sobre');
@@ -4734,16 +4755,22 @@
       return animateValue(from, to, ms, function(v) { overlay.style.opacity = v; });
     }
 
-    /* ── Exibe canvas imediatamente — elimina imagem estática ── */
-    imgEl.style.display  = 'none';
-    canvas.style.display = 'block';
-    resize();
-
     /* ── Hint de carregamento ─────────────────────────────── */
     if (hint) {
       hint.style.display = 'flex';
       hint.style.opacity = '0.55';
       hint.textContent   = '⟳ Carregando modelo 3D...';
+    }
+
+    /* ── IFCLoader carregado dinamicamente ─────────────────── */
+    let IFCLoader;
+    try {
+      const mod = await import('https://esm.sh/web-ifc-three@0.0.136?external=three');
+      IFCLoader = mod.IFCLoader;
+    } catch (e) {
+      console.error('[3D IFC] Falha ao importar IFCLoader:', e);
+      if (hint) hint.textContent = '✕ Loader indisponível';
+      return;
     }
 
     const ifcLoader = new IFCLoader();
