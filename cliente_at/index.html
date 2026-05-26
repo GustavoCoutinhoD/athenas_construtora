@@ -801,9 +801,10 @@
     }
 
     .servico-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--navy);
       margin-bottom: 14px;
     }
@@ -1228,7 +1229,7 @@
       width: 20rem;
       height: 6rem;
       border-radius: 9999px;
-      background: var(--ts-glow, #A78BFA);
+      background: var(--ts-glow, #1D6FA8);
       opacity: 0.28;
       filter: blur(48px);
       z-index: 5;
@@ -1239,7 +1240,7 @@
       top: 0;
       transform: translateY(10%);
       height: 1px;
-      background: var(--ts-glow, #A78BFA);
+      background: var(--ts-glow, #1D6FA8);
       opacity: 0.50;
       z-index: 5;
       border-radius: 9999px;
@@ -1252,7 +1253,7 @@
       transform: translateY(-20%);
       height: 5rem;
       border-radius: 9999px;
-      background: var(--ts-glow, #A78BFA);
+      background: var(--ts-glow, #1D6FA8);
       opacity: 0.20;
       filter: blur(22px);
       z-index: 3;
@@ -1272,7 +1273,7 @@
     .lamp-cone-left-inner {
       position: absolute;
       inset: 0;
-      background: conic-gradient(from 70deg at center top, var(--ts-glow, #A78BFA) 0%, transparent 40%, transparent 100%);
+      background: conic-gradient(from 70deg at center top, var(--ts-glow, #1D6FA8) 0%, transparent 40%, transparent 100%);
       opacity: 0.18;
     }
 
@@ -1306,7 +1307,7 @@
     .lamp-cone-right-inner {
       position: absolute;
       inset: 0;
-      background: conic-gradient(from 290deg at center top, transparent 0%, transparent 60%, var(--ts-glow, #A78BFA) 100%);
+      background: conic-gradient(from 290deg at center top, transparent 0%, transparent 60%, var(--ts-glow, #1D6FA8) 100%);
       opacity: 0.18;
     }
 
@@ -1405,9 +1406,11 @@
     .ts-left {
       display: flex;
       flex-direction: column;
+      margin-top: -90px;
     }
 
     .ts-eyebrow {
+      display: none;
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 4px;
@@ -1421,7 +1424,7 @@
 
     .ts-title {
       font-family: 'Anton', sans-serif;
-      font-size: clamp(36px, 4vw, 66px);
+      font-size: clamp(44px, 5vw, 82px);
       font-weight: 400;
       line-height: 1.05;
       color: #ffffff;
@@ -1475,8 +1478,8 @@
     .ts-metrics {
       display: flex;
       gap: 12px;
-      margin-bottom: 40px;
-      max-width: 400px;
+      margin: 0;
+      width: 75%;
       opacity: 0;
       transform: translateY(12px);
       animation: tsReveal 0.8s ease 0.95s forwards;
@@ -1491,8 +1494,8 @@
       border-radius: 10px;
       background: rgba(255,255,255,.03);
       transition: border-color 0.5s ease;
-      flex: 0 0 auto;
-      width: 150px;
+      flex: 1;
+      min-width: 0;
     }
 
     .ts-metric-val {
@@ -1504,6 +1507,9 @@
       letter-spacing: 0.02em;
       transition: color 0.5s ease;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .ts-metric-label {
@@ -1516,20 +1522,22 @@
     .ts-cta {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 16px 36px;
-      border: 1px solid rgba(255,255,255,.18);
+      gap: 12px;
+      padding: 18px 44px;
+      border: 1.5px solid rgba(255,255,255,.45);
       border-radius: 4px;
       color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 3px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3.5px;
       text-transform: uppercase;
       cursor: pointer;
-      background: transparent;
+      background: rgba(255,255,255,.06);
       position: relative;
       overflow: hidden;
-      transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
+      margin-top: 32px;
+      box-shadow: 0 0 28px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.12);
+      transition: border-color 0.4s ease, background 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
       text-decoration: none;
       width: fit-content;
       opacity: 0;
@@ -1547,12 +1555,13 @@
 
     .ts-cta:hover {
       border-color: var(--ts-glow, #60A5FA);
+      background: rgba(255,255,255,.10);
       transform: translateY(-3px) scale(1.02) !important;
-      box-shadow: 0 0 36px color-mix(in srgb, var(--ts-glow, #60A5FA) 40%, transparent);
+      box-shadow: 0 0 48px color-mix(in srgb, var(--ts-glow, #60A5FA) 50%, transparent);
       color: #fff;
     }
 
-    .ts-cta:hover::before { opacity: 0.1; }
+    .ts-cta:hover::before { opacity: 0.14; }
     .ts-cta svg { width: 15px; height: 15px; position: relative; z-index: 1; flex-shrink: 0; }
     .ts-cta span { position: relative; z-index: 1; }
 
@@ -1560,8 +1569,10 @@
     .ts-center {
       position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 20px;
     }
 
     .ts-img-wrap {
@@ -1643,7 +1654,7 @@
     .ts-right {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 18px;
       padding-left: 12px;
       padding-right: 0;
       border-left: 1px solid rgba(255,255,255,.06);
@@ -1708,7 +1719,7 @@
     }
 
     /* Cor da barra lateral por item */
-    .ts-nav-item:nth-child(1)::after { background: #A78BFA; }
+    .ts-nav-item:nth-child(1)::after { background: #1D6FA8; }
     .ts-nav-item:nth-child(2)::after { background: #D2B496; }
     .ts-nav-item:nth-child(3)::after { background: #FDE047; }
     .ts-nav-item:nth-child(4)::after { background: #60A5FA; }
@@ -1762,6 +1773,7 @@
 
     /* ── PROGRESS BAR ── */
     .ts-progress-bar {
+      display: none;
       position: absolute;
       bottom: 0; left: 0;
       height: 2px;
@@ -2689,6 +2701,36 @@
       .contato-form { padding: 28px; }
       .logo-slider-track img { height: 18px; }
     }
+    /* ─── 3D CANVAS RESIDENCIAL ─────────────────────────────── */
+    #ts-3d-canvas {
+      display: none;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 18px;
+      box-shadow: 0 50px 120px rgba(0,0,0,.8), 0 12px 40px rgba(0,0,0,.5);
+      cursor: crosshair;
+      background: transparent;
+    }
+
+    #ts-3d-hint {
+      display: none;
+      position: absolute;
+      bottom: 56px;
+      left: 0;
+      right: 0;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.45);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 0.4s ease;
+    }
+
     /* ─── TOONHUB HERO ──────────────────────────────────────── */
     .toon-grain {
       position: absolute;
@@ -2998,9 +3040,9 @@
       </a>
 
       <nav id="nav">
-        <a href="#sobre">Sobre</a>
+        <a href="#sobre">Projetos</a>
         <a href="#servicos">Serviços</a>
-        <a href="#projetos">Projetos</a>
+        <a href="#projetos">Portfólio</a>
         <a href="#bim">BIM</a>
         <a href="#depoimentos">Clientes</a>
       </nav>
@@ -3066,7 +3108,7 @@
   </section>
 
   <!-- ══ SOBRE / TESLA SHOWCASE ══════════════════════════════ -->
-  <div id="sobre" style="--ts-glow:#A78BFA;">
+  <div id="sobre" style="--ts-glow:#1D6FA8;">
 
     <!-- Background -->
     <div class="ts-bg">
@@ -3091,20 +3133,6 @@
         <p class="ts-desc" id="ts-desc">
           Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.
         </p>
-        <div class="ts-metrics">
-          <div class="ts-metric">
-            <span class="ts-metric-val" id="ts-m1">320m²</span>
-            <span class="ts-metric-label">Área</span>
-          </div>
-          <div class="ts-metric">
-            <span class="ts-metric-val" id="ts-m2">8 meses</span>
-            <span class="ts-metric-label">Prazo</span>
-          </div>
-          <div class="ts-metric">
-            <span class="ts-metric-val" id="ts-m3">6</span>
-            <span class="ts-metric-label">Disciplinas</span>
-          </div>
-        </div>
         <a href="#contato" class="ts-cta">
           <span>ORÇAMENTO</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -3115,11 +3143,33 @@
       <div class="ts-center">
         <div class="ts-img-wrap" id="ts-img-wrap">
           <img class="ts-img" id="ts-main-img" src="imagens/portfolio_1.png" alt="Projeto residencial ATHENAS - arquitetura e maquete 3D em São Paulo" loading="lazy">
+          <!-- Canvas 3D Residencial -->
+          <canvas id="ts-3d-canvas"></canvas>
+          <!-- Hint de interação -->
+          <div id="ts-3d-hint">
+            🖱 Clique para ver em 3 partes
+          </div>
           <div class="ts-img-glow" id="ts-img-glow"></div>
           <div class="ts-img-frame"></div>
           <div class="ts-img-badge">
             <div class="ts-img-badge-dot" id="ts-badge-dot"></div>
             <span class="ts-img-badge-text" id="ts-badge-text">Residencial</span>
+          </div>
+        </div>
+
+        <!-- Métricas abaixo da imagem -->
+        <div class="ts-metrics">
+          <div class="ts-metric">
+            <span class="ts-metric-val" id="ts-m1">320m²</span>
+            <span class="ts-metric-label">Área</span>
+          </div>
+          <div class="ts-metric">
+            <span class="ts-metric-val" id="ts-m2">3 dias</span>
+            <span class="ts-metric-label">Prazo</span>
+          </div>
+          <div class="ts-metric">
+            <span class="ts-metric-val" id="ts-m3">4X MAIS</span>
+            <span class="ts-metric-label">Precisão</span>
           </div>
         </div>
       </div>
@@ -3157,6 +3207,23 @@
     <!-- Progress bar -->
     <div class="ts-progress-bar" id="ts-progress-bar"></div>
 
+  </div>
+
+  <!-- ── Divisor ondulado: showcase → serviços ── -->
+  <div style="
+    background-color: #060810;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 70px 70px;
+    line-height: 0; margin: 0; padding: 0; overflow: hidden;
+  ">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 90"
+         preserveAspectRatio="none"
+         style="display:block;width:100%;height:90px;">
+      <path d="M0,30 C240,90 480,0 720,45 C960,90 1200,10 1440,50 L1440,90 L0,90 Z"
+            fill="#F5F4F0"/>
+    </svg>
   </div>
 
   <!-- ══ SERVIÇOS ═════════════════════════════════════════════ -->
@@ -3259,7 +3326,7 @@
     <div class="container">
       <div class="projetos-header reveal-left">
         <span class="tag">Portfólio</span>
-        <h2 class="section-title" style="color:#fff;font-family:'Cormorant Garamond',serif;font-size:clamp(32px,3.5vw,52px);font-weight:600;">NOSSOS <span>PROJETOS</span></h2>
+        <h2 class="section-title" style="color:#fff;font-family:'Cormorant Garamond',serif;font-size:clamp(32px,3.5vw,52px);font-weight:600;">NOSSO <span>PORTFÓLIO</span></h2>
 
         <!-- Abas filtro -->
         <div class="proj-tabs reveal">
@@ -3664,7 +3731,7 @@
         <div class="footer-col">
           <h4>Empresa</h4>
           <ul class="footer-links">
-            <li><a href="#sobre">Sobre Nós</a></li>
+            <li><a href="#sobre">Projetos</a></li>
             <li><a href="#projetos">Portfólio</a></li>
             <li><a href="#bim">Metodologia BIM</a></li>
             <li><a href="#depoimentos">Clientes</a></li>
@@ -3759,12 +3826,12 @@
     // ══ TESLA SHOWCASE (Sobre) ════════════════════════════════
     (function() {
       var PROJECTS = [
-        { eyebrow:'Portfólio · 01', line1:'RESIDÊNCIA',      line2:'ALTO PADRÃO',     subtitle:'Projeto Arquitetônico Residencial',   desc:'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.', img:'imagens/portfolio_1.png', m1:'320m²',   m2:'8 meses',  m3:'6',  badge:'Residencial', glow:'#60A5FA' },
-        { eyebrow:'Portfólio · 02', line1:'PROJETO',         line2:'COMERCIAL',        subtitle:'Arquitetura Corporativa',             desc:'Desenvolvimento completo de empreendimento comercial, integrando todas as disciplinas em modelo federado com análise de interferências e quantitativos precisos.', img:'imagens/portfolio_2.png', m1:'580m²',   m2:'12 meses', m3:'8',  badge:'Comercial',   glow:'#C89B3C' },
-        { eyebrow:'Portfólio · 03', line1:'COMPATIBILIZAÇÃO',line2:'BIM',              subtitle:'Modelo Federado Multidisciplinar',    desc:'Federação de modelos com detecção e resolução de interferências via Navisworks. Relatório completo de conflitos com priorização e acompanhamento técnico.', img:'imagens/portfolio_3.png', m1:'1.200m²', m2:'6 meses',  m3:'12', badge:'BIM',          glow:'#06B6D4' },
-        { eyebrow:'Portfólio · 04', line1:'REFORMA &',       line2:'INTERIORES',       subtitle:'Requalificação de Ambientes',         desc:'Projeto completo de reforma com levantamento arquitetônico, projeto executivo, especificações de materiais e acompanhamento técnico de obra.', img:'imagens/portfolio_4.png', m1:'180m²',   m2:'4 meses',  m3:'5',  badge:'Reforma',      glow:'#A78BFA' }
+        { eyebrow:'Portfólio · 01', line1:'RESIDÊNCIA',      line2:'ALTO PADRÃO',     subtitle:'Projeto Arquitetônico Residencial',   desc:'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.', img:'imagens/portfolio_1.png', m1:'320m²',   m2:'3 dias',  m3:'4X MAIS',  badge:'Residencial', glow:'#60A5FA' },
+        { eyebrow:'Portfólio · 02', line1:'PROJETO',         line2:'COMERCIAL',        subtitle:'Arquitetura Corporativa',             desc:'Desenvolvimento completo de empreendimento comercial, integrando todas as disciplinas em modelo federado com análise de interferências e quantitativos precisos.', img:'imagens/portfolio_2.png', m1:'580m²',   m2:'5 dias', m3:'4X MAIS',  badge:'Comercial',   glow:'#C89B3C' },
+        { eyebrow:'Portfólio · 03', line1:'COMPATIBILIZAÇÃO',line2:'BIM',              subtitle:'Modelo Federado Multidisciplinar',    desc:'Federação de modelos com detecção e resolução de interferências via Navisworks. Relatório completo de conflitos com priorização e acompanhamento técnico.', img:'imagens/portfolio_3.png', m1:'1.200m²', m2:'4 dias',  m3:'4X MAIS',  badge:'BIM',          glow:'#06B6D4' },
+        { eyebrow:'Portfólio · 04', line1:'REFORMA &',       line2:'INTERIORES',       subtitle:'Requalificação de Ambientes',         desc:'Projeto completo de reforma com levantamento arquitetônico, projeto executivo, especificações de materiais e acompanhamento técnico de obra.', img:'imagens/portfolio_4.png', m1:'180m²',   m2:'7 dias',  m3:'4X MAIS',  badge:'Reforma',      glow:'#A78BFA' }
       ];
-      var current=0, autoTimer=null, transitioning=false, AUTO_DELAY=5500;
+      var current=0, autoTimer=null, transitioning=false, AUTO_DELAY=8000;
       var section=document.getElementById('sobre'), mainImg=document.getElementById('ts-main-img'), imgWrap=document.getElementById('ts-img-wrap'), imgGlow=document.getElementById('ts-img-glow'), badgeDot=document.getElementById('ts-badge-dot'), badgeText=document.getElementById('ts-badge-text'), progressBar=document.getElementById('ts-progress-bar'), counterWrap=document.getElementById('ts-counter');
       var navItems=document.querySelectorAll('#sobre .ts-nav-item');
       var el={eyebrow:document.getElementById('ts-eyebrow'),line1:document.getElementById('ts-line1'),line2:document.getElementById('ts-line2'),subtitle:document.getElementById('ts-subtitle'),desc:document.getElementById('ts-desc'),m1:document.getElementById('ts-m1'),m2:document.getElementById('ts-m2'),m3:document.getElementById('ts-m3'),divider:document.getElementById('ts-divider-line')};
@@ -4012,9 +4079,9 @@
           subtitle: 'Projeto Arquitetônico Residencial',
           desc: 'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.',
           img: 'imagens/portfolio_1.png',
-          m1: '320m²', m2: '1 sem', m3: '6',
+          m1: '320m²', m2: '3 dias', m3: '4X MAIS',
           badge: 'Residencial',
-          glow: '#A78BFA'
+          glow: '#1D6FA8'
         },
         {
           eyebrow: 'Portfólio · 02',
@@ -4023,7 +4090,7 @@
           subtitle: 'Arquitetura Corporativa',
           desc: 'Desenvolvimento completo de empreendimento comercial, integrando todas as disciplinas em modelo federado com análise de interferências e quantitativos precisos.',
           img: 'imagens/portfolio_2.png',
-          m1: '580m²', m2: '2 sem', m3: '8',
+          m1: '580m²', m2: '5 dias', m3: '4X MAIS',
           badge: 'Comercial',
           glow: '#D2B496'
         },
@@ -4034,7 +4101,7 @@
           subtitle: 'Instalações Elétricas Prediais',
           desc: 'Projeto elétrico completo com dimensionamento de circuitos, quadros de distribuição, SPDA e automação predial, compatibilizado em plataforma BIM.',
           img: 'imagens/portfolio_3.png',
-          m1: '850m²', m2: '1 sem', m3: '7',
+          m1: '850m²', m2: '4 dias', m3: '4X MAIS',
           badge: 'Elétrica',
           glow: '#FDE047'
         },
@@ -4045,7 +4112,7 @@
           subtitle: 'Sistemas Hidrossanitários',
           desc: 'Projeto hidrossanitário completo com dimensionamento de redes de água fria, quente, esgoto e pluvial, compatibilizado em modelo BIM federado.',
           img: 'imagens/portfolio_4.png',
-          m1: '420m²', m2: '2 sem', m3: '4',
+          m1: '420m²', m2: '6 dias', m3: '4X MAIS',
           badge: 'Hidráulica',
           glow: '#60A5FA'
         },
@@ -4056,7 +4123,7 @@
           subtitle: 'Visualização Fotorrealista',
           desc: 'Modelagem e renderização 3D fotorrealista de empreendimentos residenciais e comerciais, com ambientação completa e materiais de alta qualidade.',
           img: 'imagens/portfolio_1.png',
-          m1: '360m²', m2: '1 sem', m3: '3',
+          m1: '360m²', m2: '7 dias', m3: '4X MAIS',
           badge: 'Maquete 3D',
           glow: '#C89B3C'
         }
@@ -4065,7 +4132,7 @@
       var current   = 0;
       var autoTimer = null;
       var transitioning = false;
-      var AUTO_DELAY = 5500;
+      var AUTO_DELAY = 8000;
 
       var section   = document.getElementById('sobre');
       var mainImg   = document.getElementById('ts-main-img');
@@ -4560,6 +4627,447 @@
     });
   })();
   </script>
+
+
+  <!-- ══ 3D RESIDENCIAL — Import Map ══════════════════════════ -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <!-- ══ 3D RESIDENCIAL — Módulo principal ══════════════════════ -->
+  <script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  (async function init3DResidencial() {
+
+    const canvas = document.getElementById('ts-3d-canvas');
+    const imgEl  = document.getElementById('ts-main-img');
+    const wrap   = document.getElementById('ts-img-wrap');
+    const hint   = document.getElementById('ts-3d-hint');
+    if (!canvas || !imgEl || !wrap) return;
+
+    /* ── Overlay de transição (fade entre modos) ──────────── */
+    const overlay = document.createElement('div');
+    overlay.style.cssText = [
+      'position:absolute', 'inset:0',
+      'background:rgba(6,8,16,0.97)',
+      'border-radius:18px',
+      'opacity:0',
+      'pointer-events:none',
+      'z-index:6',
+      'transition:none'
+    ].join(';');
+    wrap.appendChild(overlay);
+
+    /* ── Renderer ────────────────────────────────────── */
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled   = true;
+    renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace    = THREE.SRGBColorSpace;
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
+    /* ── Cena / Câmera ──────────────────────────────────── */
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
+
+    /* ── Iluminação ──────────────────────────────────────── */
+    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+    const sun = new THREE.DirectionalLight(0xfff5e0, 3.5);
+    sun.position.set(20, 40, 20);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.bias = -0.0005;
+    scene.add(sun);
+    const fillLight = new THREE.DirectionalLight(0xaac4ff, 0.9);
+    fillLight.position.set(-15, 10, -15);
+    scene.add(fillLight);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a2e, 0.7));
+
+    /* ── Helpers matemáticos ───────────────────────────────── */
+    const loader  = new GLTFLoader();
+    const loadGLB = url => new Promise((res, rej) => loader.load(url, res, undefined, rej));
+    const getBox  = m  => new THREE.Box3().setFromObject(m);
+    const getSize = b  => { const v = new THREE.Vector3(); b.getSize(v); return v; };
+    const getCtr  = b  => { const v = new THREE.Vector3(); b.getCenter(v); return v; };
+    const lerp    = (a, b, t) => a + (b - a) * t;
+
+    function easeInOut(t) { return t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t; }
+    function easeOut(t)   { return 1 - (1-t)*(1-t); }
+
+    function centerXZ(m) {
+      const c = getCtr(getBox(m));
+      m.position.x -= c.x;
+      m.position.z -= c.z;
+    }
+
+    function fitCamera(model) {
+      const box  = getBox(model);
+      const size = getSize(box);
+      const ctr  = getCtr(box);
+      const maxD = Math.max(size.x, size.y, size.z);
+      const fRad = camera.fov * Math.PI / 180;
+      const dist = (maxD / 2) / Math.tan(fRad / 2) * 2.4;
+      camera.position.set(dist * 0.60, dist * 0.42, dist * 0.92);
+      camera.lookAt(ctr);
+      const hs = maxD * 1.2;
+      Object.assign(sun.shadow.camera, { left:-hs, right:hs, bottom:-hs, top:hs, far: dist*4 });
+      sun.shadow.camera.updateProjectionMatrix();
+      return { dist, maxD, ctr };
+    }
+
+    /* ── Animação genérica baseada em tempo ─────────────────────── */
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    function animateValue(from, to, duration, onUpdate, easeFn) {
+      easeFn = easeFn || easeInOut;
+      return new Promise(function(resolve) {
+        var start = performance.now();
+        function step() {
+          var raw = Math.min(1, (performance.now() - start) / duration);
+          onUpdate(lerp(from, to, easeFn(raw)));
+          if (raw < 1) requestAnimationFrame(step);
+          else resolve();
+        }
+        requestAnimationFrame(step);
+      });
+    }
+
+    /* fade do overlay: 0 = transparente, 1 = escuro */
+    function fadeOverlay(from, to, ms) {
+      return animateValue(from, to, ms, function(v) { overlay.style.opacity = v; });
+    }
+
+    /* ── Carrega todos os modelos em paralelo ────────────────── */
+    var resM, baseM, meioM, telhadoM;
+    try {
+      const [rg, bg, mg, tg] = await Promise.all([
+        loadGLB('3D/residencial.glb'),
+        loadGLB('3D/base_projeto_residencial.glb'),
+        loadGLB('3D/meio_projeto_residencial.glb'),
+        loadGLB('3D/telhado_projeto_residencial.glb'),
+      ]);
+      resM     = rg.scene;
+      baseM    = bg.scene;
+      meioM    = mg.scene;
+      telhadoM = tg.scene;
+    } catch (err) {
+      console.error('[3D Residencial] Falha ao carregar modelos:', err);
+      return;
+    }
+
+    [resM, baseM, meioM, telhadoM].forEach(function(m) {
+      m.traverse(function(c) { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
+    });
+
+    /* ── Grupo A: modelo único residencial.glb ────────────────── */
+    centerXZ(resM);
+    const groupA = new THREE.Group();
+    groupA.add(resM);
+    const gcA = getCtr(getBox(groupA));
+    groupA.position.y -= gcA.y;
+
+    /* ── Grupo B: 3 peças ──────────────────────────────────────── */
+    [baseM, meioM, telhadoM].forEach(centerXZ);
+
+    const bBase    = getBox(baseM),    sBase    = getSize(bBase);
+    const bMeio    = getBox(meioM),    sMeio    = getSize(bMeio);
+    const bTelhado = getBox(telhadoM), sTelhado = getSize(bTelhado);
+    const spread   = Math.abs(getCtr(bTelhado).y - getCtr(bBase).y);
+    const sumH     = sBase.y + sMeio.y + sTelhado.y;
+
+    if (spread < sumH * 0.20) {
+      const GAP = sumH * 0.008;
+      baseM.position.y    = -bBase.min.y;
+      meioM.position.y    = sBase.y - bMeio.min.y + GAP;
+      telhadoM.position.y = sBase.y + sMeio.y - getBox(telhadoM).min.y + GAP * 2;
+    }
+
+    const groupB = new THREE.Group();
+    groupB.add(baseM, meioM, telhadoM);
+    const gcB = getCtr(getBox(groupB));
+    groupB.position.y -= gcB.y;
+
+    /* posições MONTADAS de cada peça (relativas a groupB) */
+    const baseYa    = baseM.position.y;
+    const meioYa    = meioM.position.y;
+    const telhadoYa = telhadoM.position.y;
+
+    /* posições EXPLODIDAS (suspensas, espaçadas) */
+    const baseYe    = baseYa    - sumH * 0.18;   /* base desce levemente */
+    const meioYe    = meioYa    + sumH * 0.22;   /* meio sobe moderado   */
+    const telhadoYe = telhadoYa + sumH * 0.50;   /* telhado sobe bastante*/
+
+    /* ── Animação das peças: 0 = montado, 1 = explodido ──────────── */
+    function setParts(prog, easeFn) {
+      var p = easeFn ? easeFn(prog) : prog;
+      baseM.position.y    = lerp(baseYa, baseYe, p);
+      meioM.position.y    = lerp(meioYa, meioYe, p);
+      telhadoM.position.y = lerp(telhadoYa, telhadoYe, p);
+    }
+
+    function animateParts(from, to, duration, easeFn) {
+      return animateValue(from, to, duration, function(prog) { setParts(prog); }, easeFn);
+    }
+
+    /* ── Chão compartilhado ────────────────────────────────── */
+    const maxXZ = Math.max(...[resM, baseM, meioM, telhadoM].map(function(m) {
+      var s = getSize(getBox(m)); return Math.max(s.x, s.z);
+    }));
+    const floor = new THREE.Mesh(
+      new THREE.CircleGeometry(maxXZ * 1.8, 64),
+      new THREE.MeshStandardMaterial({ color: 0x060810, roughness: 0.96, transparent: true, opacity: 0.28 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    /* ── Estado global ──────────────────────────────────────── */
+    /*  'A'        — exibindo groupA (residencial.glb)
+        'EXPLODED' — exibindo groupB explodido
+        'BUSY'     — transição em curso (cliques ignorados)    */
+    let state    = 'A';
+    let rotY     = 0.35;
+    let rotX     = 0;          /* inclinação vertical (mouse direito) */
+    let visible  = false;
+    let rafId    = null;
+    const baseFOV   = camera.fov;
+    let   targetFOV = baseFOV;
+
+    /* ── Arrasto com botão direito ────────────────────────── */
+    let isDragging  = false;
+    let dragLastX   = 0;
+    let dragLastY   = 0;
+
+    scene.add(groupA);
+
+    /* ── Scroll zoom (FOV) ────────────────────────────────── */
+    canvas.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      targetFOV = Math.max(10, Math.min(75, targetFOV + e.deltaY * 0.06));
+    }, { passive: false });
+
+    canvas.addEventListener('dblclick', function() { targetFOV = baseFOV; });
+
+    /* ── Controle de ângulo com botão direito do mouse ────────── */
+    /* impede menu de contexto nativo no canvas */
+    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+    canvas.addEventListener('mousedown', function(e) {
+      if (e.button !== 2) return;
+      isDragging = true;
+      dragLastX  = e.clientX;
+      dragLastY  = e.clientY;
+      canvas.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      const dx = e.clientX - dragLastX;
+      const dy = e.clientY - dragLastY;
+      dragLastX = e.clientX;
+      dragLastY = e.clientY;
+
+      /* horizontal → Y; vertical → X (limitado a ±55°) */
+      rotY += dx * 0.008;
+      rotX  = Math.max(-Math.PI * 0.30, Math.min(Math.PI * 0.30, rotX + dy * 0.008));
+    });
+
+    function stopDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      canvas.style.cursor = 'crosshair';
+      /* rotX vai lerpar suavemente de volta a 0 no tick loop */
+    }
+    window.addEventListener('mouseup',    function(e) { if (e.button === 2) stopDrag(); });
+    window.addEventListener('mouseleave', stopDrag);
+    canvas.addEventListener('mouseleave', stopDrag);
+
+    /* ── helper: atualiza texto do hint com fade ───────────────── */
+    function setHint(txt) {
+      if (!hint) return;
+      hint.style.transition = 'opacity 0.3s ease';
+      hint.style.opacity = '0';
+      setTimeout(function() {
+        hint.textContent  = txt;
+        hint.style.opacity = '0.55';
+      }, 350);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       CLIQUE — sequência completa de animação
+    ══════════════════════════════════════════════════════════ */
+    canvas.addEventListener('click', async function() {
+      if (state === 'BUSY') return;
+      const previousState = state;
+      state = 'BUSY';
+
+      /* ─────────────────────────────────────────────
+         A  →  EXPLODED
+         1. Fade-out groupA  (450 ms)
+         2. Troca para groupB montado, fade-in (450 ms)
+         3. Aguarda 1 s
+         4. Animação de explosão (900 ms, easeOut)
+      ───────────────────────────────────────────── */
+      if (previousState === 'A') {
+        if (hint) hint.style.opacity = '0';
+
+        /* 1 — apaga groupA com fade */
+        await fadeOverlay(0, 1, 450);
+
+        /* troca grupos; garante posições montadas */
+        scene.remove(groupA);
+        setParts(0);
+        scene.add(groupB);
+        fitCamera(groupB);
+        targetFOV = camera.fov;
+
+        /* 2 — revela groupB montado */
+        await fadeOverlay(1, 0, 450);
+
+        /* hint intermediário */
+        if (hint) {
+          hint.style.transition = 'none';
+          hint.textContent  = '✶ Aguarde...';
+          hint.style.opacity = '0.35';
+        }
+
+        /* 3 — pausa 1 segundo: usuário vê a casa montada */
+        await sleep(1000);
+
+        /* 4 — explosão: peças sobem e ficam suspensas */
+        targetFOV = Math.min(70, camera.fov + 12);   /* abre câmera levemente */
+        await animateParts(0, 1, 900, easeOut);
+
+        state = 'EXPLODED';
+        setHint('🖱 Clique para voltar ao modelo completo');
+
+      /* ─────────────────────────────────────────────
+         EXPLODED  →  A
+         1. Colapso: peças voltam ao montado (700 ms)
+         2. Pausa 200 ms (deleite visual)
+         3. Fade-out groupB (450 ms)
+         4. Troca para groupA, fade-in (450 ms)
+      ───────────────────────────────────────────── */
+      } else {
+        if (hint) hint.style.opacity = '0';
+
+        /* 1 — recolhe as peças de volta ao montado */
+        targetFOV = baseFOV;
+        await animateParts(1, 0, 700, easeInOut);
+
+        /* 2 — breve pausa com as 3 peças montadas */
+        await sleep(200);
+
+        /* 3 — apaga groupB */
+        await fadeOverlay(0, 1, 450);
+
+        /* troca grupos */
+        scene.remove(groupB);
+        scene.add(groupA);
+        fitCamera(groupA);
+        targetFOV = camera.fov;
+
+        /* 4 — revela groupA */
+        await fadeOverlay(1, 0, 450);
+
+        state = 'A';
+        setHint('🖱 Clique para ver em 3 partes');
+      }
+    });
+
+    /* ── Resize ──────────────────────────────────────────── */
+    function resize() {
+      var w = canvas.offsetWidth, h = canvas.offsetHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    /* ── Render loop ───────────────────────────────────────── */
+    function tick() {
+      rafId = requestAnimationFrame(tick);
+      if (!visible) return;
+
+      /* zoom suave */
+      camera.fov += (targetFOV - camera.fov) * 0.09;
+      camera.updateProjectionMatrix();
+
+      /* rotação horizontal automática (sempre avança) */
+      rotY += 0.004;
+
+      /* inclinação vertical: lerpa de volta a 0 quando soltar o botão direito */
+      if (!isDragging) rotX += (0 - rotX) * 0.06;
+
+      /* aplica rotações nos dois grupos */
+      groupA.rotation.set(rotX, rotY, 0);
+      groupB.rotation.set(rotX, rotY, 0);
+
+      renderer.render(scene, camera);
+    }
+
+    /* ── Show / Hide (integração showcase) ─────────────────────── */
+    function show() {
+      imgEl.style.display   = 'none';
+      canvas.style.display  = 'block';
+      overlay.style.opacity = '0';
+      if (hint) {
+        hint.style.display    = 'flex';
+        hint.style.transition = 'none';
+        hint.style.opacity    = '0.55';
+        hint.textContent      = '🖱 Clique para ver em 3 partes';
+      }
+      visible = true;
+      fitCamera(groupA);
+      resize();
+      if (!rafId) tick();
+    }
+
+    function hide() {
+      canvas.style.display  = 'none';
+      overlay.style.opacity = '0';
+      if (hint) hint.style.display = 'none';
+      visible = false;
+      /* força reset completo independente do estado atual */
+      setParts(0);
+      scene.remove(groupB);
+      if (!scene.children.includes(groupA)) scene.add(groupA);
+      state      = 'A';
+      targetFOV  = baseFOV;
+      rotX       = 0;
+      isDragging = false;
+      canvas.style.cursor = 'crosshair';
+      imgEl.style.display = '';
+    }
+
+    /* ── MutationObserver: detecta nav ativa no showcase ─────────── */
+    const mo = new MutationObserver(function() {
+      const active = document.querySelector('#sobre .ts-nav-item.active');
+      parseInt(active?.dataset?.index) === 0 ? show() : hide();
+    });
+    document.querySelectorAll('#sobre .ts-nav-item').forEach(function(ni) {
+      mo.observe(ni, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    const ini = document.querySelector('#sobre .ts-nav-item.active');
+    if (parseInt(ini?.dataset?.index) === 0) show();
+
+    window.addEventListener('resize', resize);
+    tick();
+
+  })();
+  </script>
+
 
 </body>
 </html>
