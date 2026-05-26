@@ -2724,7 +2724,7 @@
       .contato-form { padding: 28px; }
       .logo-slider-track img { height: 18px; }
     }
-    /* ─── 3D CANVAS RESIDENCIAL ─────────────────────────────── */
+    /* ─── 3D CANVAS MAQUETE ─────────────────────────────────── */
     #ts-3d-canvas {
       display: none;
       width: 100%;
@@ -3166,7 +3166,7 @@
       <div class="ts-center">
         <div class="ts-img-wrap" id="ts-img-wrap">
           <img class="ts-img" id="ts-main-img" src="imagens/portfolio_1.png" alt="Projeto residencial ATHENAS - arquitetura e maquete 3D em São Paulo" loading="lazy">
-          <!-- Canvas 3D Residencial -->
+          <!-- Canvas 3D Maquete -->
           <canvas id="ts-3d-canvas"></canvas>
           <!-- Hint de interação -->
           <div id="ts-3d-hint">
@@ -4618,7 +4618,7 @@
   }
   </script>
 
-  <!-- ══ Canvas-visibility controller (independente do módulo IFC) ══ -->
+  <!-- ══ Canvas-visibility controller (independente do módulo 3D) ══ -->
   <script>
   (function() {
     function syncCanvas() {
@@ -4626,9 +4626,9 @@
       var img    = document.getElementById('ts-main-img');
       var canvas = document.getElementById('ts-3d-canvas');
       if (!img || !canvas) return;
-      var isRes = active && parseInt(active.dataset.index) === 0;
-      img.style.display    = isRes ? 'none' : '';
-      canvas.style.display = isRes ? 'block' : 'none';
+      var is3D = active && parseInt(active.dataset.index) === 4;  /* MAQUETE 3D */
+      img.style.display    = is3D ? 'none' : '';
+      canvas.style.display = is3D ? 'block' : 'none';
     }
     document.addEventListener('DOMContentLoaded', function() {
       syncCanvas();
@@ -4639,7 +4639,7 @@
   })();
   </script>
 
-  <!-- ══ 3D RESIDENCIAL — GLB (convertido do IFC) ══════════════ -->
+  <!-- ══ 3D MAQUETE — GLB (convertido do IFC Revit) ══════════════ -->
   <script type="module">
   import * as THREE from 'three';
   import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
@@ -4807,12 +4807,117 @@
       default:  { roughness: 0.72, metalness: 0.02, transparent: false, opacity: 1.0  },
     };
 
+    /* ── Textura procedural value-noise (sem download) ────────────
+       Gera uma textura tileable 128×128 com noise coerente em 3 oitavas.
+       Usada como mapa de variação de cor + roughness via triplanar UV.
+    ──────────────────────────────────────────────────────────────── */
+    function makeValueNoise(size, cell) {
+      const GS   = Math.ceil(size / cell) + 2;
+      const grid = new Float32Array(GS * GS);
+      for (let i = 0; i < grid.length; i++) grid[i] = Math.random();
+      const g = (gx, gy) =>
+        grid[Math.min(GS-1, Math.max(0,gy)) * GS + Math.min(GS-1, Math.max(0,gx))];
+
+      const px = size * size * 4;
+      const img = new Uint8ClampedArray(px);
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const gx = x / cell, gy = y / cell;
+          const gxi = Math.floor(gx), gyi = Math.floor(gy);
+          const fx = gx - gxi, fy = gy - gyi;
+          const sx = fx*fx*(3-2*fx), sy = fy*fy*(3-2*fy);
+          const v  = g(gxi,gyi)*(1-sx)*(1-sy) + g(gxi+1,gyi)*sx*(1-sy)
+                   + g(gxi,gyi+1)*(1-sx)*sy   + g(gxi+1,gyi+1)*sx*sy;
+          const c = Math.round(v * 255);
+          const i = (y * size + x) * 4;
+          img[i] = img[i+1] = img[i+2] = c; img[i+3] = 255;
+        }
+      }
+      const cvs = document.createElement('canvas');
+      cvs.width = cvs.height = size;
+      cvs.getContext('2d').putImageData(new ImageData(img, size, size), 0, 0);
+      const t = new THREE.CanvasTexture(cvs);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      return t;
+    }
+
+    /* Noise em 3 oitavas — textura final para triplanar */
+    function makeMultiNoise(size) {
+      const a = makeValueNoise(size, 24);  // baixa freq
+      const b = makeValueNoise(size, 8);   // média freq
+      const c = makeValueNoise(size, 3);   // alta freq (grão fino)
+      /* combina as 3 oitavas num único canvas */
+      const cv  = document.createElement('canvas');
+      cv.width  = cv.height = size;
+      const ctx = cv.getContext('2d');
+      ctx.drawImage(a.image, 0, 0);
+      ctx.globalAlpha = 0.45; ctx.drawImage(b.image, 0, 0);
+      ctx.globalAlpha = 0.20; ctx.drawImage(c.image, 0, 0);
+      ctx.globalAlpha = 1.0;
+      const t = new THREE.CanvasTexture(cv);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      /* Descarta texturas intermediárias */
+      a.dispose(); b.dispose(); c.dispose();
+      return t;
+    }
+
+    const _surfaceTex = makeMultiNoise(128);
+
+    /* ── Triplanar UV via onBeforeCompile ──────────────────────────
+       Injeta posição world no vertex shader e faz blending triplanar
+       no fragment para modular cor e roughness sem UVs no modelo.
+    ──────────────────────────────────────────────────────────────── */
+    function applyTriplanar(mat, tex, scale) {
+      mat.onBeforeCompile = function(shader) {
+        shader.uniforms.triMap   = { value: tex };
+        shader.uniforms.triScale = { value: scale };
+
+        /* Vertex: passa posição world como varying */
+        shader.vertexShader = 'varying vec3 vWorldPos;\n' + shader.vertexShader;
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <project_vertex>',
+          '#include <project_vertex>\nvWorldPos=(modelMatrix*vec4(transformed,1.0)).xyz;'
+        );
+
+        /* Fragment: uniformes + varying */
+        shader.fragmentShader =
+          'varying vec3 vWorldPos;\nuniform sampler2D triMap;\nuniform float triScale;\n'
+          + shader.fragmentShader;
+
+        /* Calcula triN imediatamente após diffuseColor (antes de color_fragment) */
+        shader.fragmentShader = shader.fragmentShader.replace(
+          'vec4 diffuseColor = vec4( diffuse, opacity );',
+          `vec4 diffuseColor = vec4( diffuse, opacity );
+           vec3 _tw = abs(vNormal);
+           _tw = pow(_tw, vec3(3.0));
+           _tw /= (_tw.x + _tw.y + _tw.z + 1e-4);
+           float triN =
+             texture2D(triMap, vWorldPos.yz * triScale).r * _tw.x +
+             texture2D(triMap, vWorldPos.xz * triScale).r * _tw.y +
+             texture2D(triMap, vWorldPos.xy * triScale).r * _tw.z;`
+        );
+
+        /* Modula cor: ±18% variação de luminosidade (textura visível) */
+        shader.fragmentShader = shader.fragmentShader.replace(
+          '#include <color_fragment>',
+          '#include <color_fragment>\ndiffuseColor.rgb *= (0.82 + triN * 0.36);'
+        );
+
+        /* Modula roughness: superfícies com variação micro-geométrica */
+        shader.fragmentShader = shader.fragmentShader.replace(
+          '#include <roughnessmap_fragment>',
+          '#include <roughnessmap_fragment>\nroughnessFactor=clamp(roughnessFactor*(0.60+triN*0.80),0.0,1.0);'
+        );
+      };
+      mat.customProgramCacheKey = () => 'triplanar_' + scale;
+    }
+
     /* Cache de materiais por categoria (reutiliza instância) */
     const matCache = {};
     function getMat(cat) {
       if (matCache[cat]) return matCache[cat];
       const p = CAT_PBR[cat] || CAT_PBR.default;
-      matCache[cat] = new THREE.MeshStandardMaterial({
+      const m = new THREE.MeshStandardMaterial({
         vertexColors    : true,
         roughness       : p.roughness,
         metalness       : p.metalness,
@@ -4821,7 +4926,10 @@
         side            : THREE.DoubleSide,
         envMapIntensity : 1.3,
       });
-      return matCache[cat];
+      /* Aplica textura triplanar em materiais sólidos (não vidro) */
+      if (!p.transparent) applyTriplanar(m, _surfaceTex, 1.6);
+      matCache[cat] = m;
+      return m;
     }
 
     ifcModel.traverse(c => {
@@ -5150,14 +5258,14 @@
     /* ── MutationObserver: detecta nav ativa no showcase ─────────── */
     const mo = new MutationObserver(function() {
       const active = document.querySelector('#sobre .ts-nav-item.active');
-      parseInt(active?.dataset?.index) === 0 ? show() : hide();
+      parseInt(active?.dataset?.index) === 4 ? show() : hide();  /* MAQUETE 3D */
     });
     document.querySelectorAll('#sobre .ts-nav-item').forEach(function(ni) {
       mo.observe(ni, { attributes: true, attributeFilter: ['class'] });
     });
 
     const ini = document.querySelector('#sobre .ts-nav-item.active');
-    if (parseInt(ini?.dataset?.index) === 0) show();
+    if (parseInt(ini?.dataset?.index) === 4) show();  /* MAQUETE 3D */
 
     window.addEventListener('resize', resize);
     tick();
