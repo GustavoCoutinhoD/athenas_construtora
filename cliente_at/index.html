@@ -583,9 +583,6 @@
     }
 
     /* ─── SOBRE ─────────────────────────────────────────────── */
-    #sobre {
-      background: var(--white);
-    }
 
     .sobre-grid {
       display: grid;
@@ -1603,6 +1600,8 @@
       width: 75%;
       margin: 0 auto;
       opacity: 0;
+      overflow: hidden;         /* impede ts-img-glow (inset:-30px) de vazar fora */
+      border-radius: 18px;
       animation: tsReveal 1s cubic-bezier(0.4,0,0.2,1) 0.5s forwards;
     }
 
@@ -4625,10 +4624,13 @@
       var active = document.querySelector('#sobre .ts-nav-item.active');
       var img    = document.getElementById('ts-main-img');
       var canvas = document.getElementById('ts-3d-canvas');
+      var glow   = document.getElementById('ts-img-glow');
       if (!img || !canvas) return;
       var is3D = active && parseInt(active.dataset.index) === 4;  /* MAQUETE 3D */
-      img.style.display    = is3D ? 'none' : '';
+      img.style.display    = is3D ? 'none'  : '';
       canvas.style.display = is3D ? 'block' : 'none';
+      /* Oculta o halo de glow no modo 3D — o canvas tem sua própria iluminação */
+      if (glow) glow.style.opacity = is3D ? '0' : '';
     }
     document.addEventListener('DOMContentLoaded', function() {
       syncCanvas();
