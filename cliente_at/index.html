@@ -4642,7 +4642,8 @@
   <!-- ══ 3D RESIDENCIAL — GLB (convertido do IFC) ══════════════ -->
   <script type="module">
   import * as THREE from 'three';
-  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
   /* ── Só inicializa quando a seção entrar na tela ── */
   const _triggerEl = document.getElementById('sobre');
@@ -4684,27 +4685,43 @@
     renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
     renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.3;
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
 
-    /* ── Iluminação ──────────────────────────────────────── */
-    scene.add(new THREE.AmbientLight(0xffffff, 2.2));
-    const sun = new THREE.DirectionalLight(0xfff8e8, 4.5);
+    /* ── Ambiente IBL (RoomEnvironment) — iluminação realista ── */
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    const envTexture = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+    scene.environment = envTexture;   /* IBL em todos os materiais PBR */
+    pmrem.dispose();
+
+    /* ── Iluminação (IBL via RoomEnvironment + luzes diretas) ────── */
+    /* AmbientLight leve — IBL faz a maior parte do trabalho */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+    /* Sol principal — sombra nítida */
+    const sun = new THREE.DirectionalLight(0xfff4e0, 3.8);
     sun.position.set(25, 50, 30);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
     sun.shadow.bias = -0.0003;
     scene.add(sun);
-    const fillLight = new THREE.DirectionalLight(0xc8deff, 1.8);
-    fillLight.position.set(-20, 15, -20);
+
+    /* Luz de preenchimento fria (céu) */
+    const fillLight = new THREE.DirectionalLight(0xb8d0ff, 1.4);
+    fillLight.position.set(-20, 20, -15);
     scene.add(fillLight);
-    const rimLight = new THREE.DirectionalLight(0xffeedd, 1.2);
-    rimLight.position.set(0, -5, -30);
+
+    /* Rim light quente (contraluz) */
+    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.9);
+    rimLight.position.set(5, -5, -35);
     scene.add(rimLight);
-    scene.add(new THREE.HemisphereLight(0xe8f4ff, 0x2a2a3e, 1.1));
+
+    /* Hemisphere para o chão */
+    scene.add(new THREE.HemisphereLight(0xd0e8ff, 0x1a1a2e, 0.8));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -4783,30 +4800,33 @@
       if (!c.isMesh) return;
       c.castShadow = c.receiveShadow = true;
 
-      /* Garante normais suaves do GLB */
+      /* Garante normais do GLB */
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
 
-      /* Faz upgrade para MeshStandardMaterial PBR com vertex colors */
-      const src = Array.isArray(c.material) ? c.material[0] : c.material;
-      if (!src) return;
+      const mats = Array.isArray(c.material) ? c.material : [c.material];
+      const result = mats.map(src => {
+        if (!src) return src;
 
-      const useVC = src.vertexColors || !!c.geometry.attributes.color;
+        if (src.isMeshBasicMaterial || src.isMeshLambertMaterial) {
+          /* único caso que faz upgrade — Basic/Lambert não respondem à luz IBL */
+          const useVC = src.vertexColors || !!c.geometry.attributes.color;
+          return new THREE.MeshStandardMaterial({
+            vertexColors : useVC,
+            color        : useVC ? 0xffffff : src.color,
+            roughness    : 0.72,
+            metalness    : 0.02,
+            side         : THREE.DoubleSide,
+          });
+        }
 
-      if (src.isMeshBasicMaterial || src.isMeshLambertMaterial) {
-        /* substitui por PBR que responde à luz */
-        c.material = new THREE.MeshStandardMaterial({
-          vertexColors : useVC,
-          color        : useVC ? 0xffffff : src.color,
-          roughness    : 0.70,
-          metalness    : 0.04,
-          side         : THREE.DoubleSide,
-        });
-      } else {
-        src.roughness   = 0.70;
-        src.metalness   = 0.04;
-        src.side        = THREE.DoubleSide;
-        src.needsUpdate = true;
-      }
+        /* MeshStandardMaterial do GLB já tem PBR correto do Python (vidro, metal, etc.)
+           — só garante DoubleSide e envMapIntensity para o IBL */
+        src.side             = THREE.DoubleSide;
+        src.envMapIntensity  = 1.2;
+        src.needsUpdate      = true;
+        return src;
+      });
+      c.material = Array.isArray(c.material) ? result : result[0];
     });
 
     /* ── Corrige eixo: IFC=Z-up → Three.js=Y-up ──────────────── */
