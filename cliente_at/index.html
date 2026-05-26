@@ -4807,129 +4807,26 @@
       default:  { roughness: 0.72, metalness: 0.02, transparent: false, opacity: 1.0  },
     };
 
-    /* ── Textura procedural value-noise (sem download) ────────────
-       Gera uma textura tileable 128×128 com noise coerente em 3 oitavas.
-       Usada como mapa de variação de cor + roughness via triplanar UV.
+    /* ── Cache de materiais por categoria ─────────────────────────
+       Vertex colors vêm do GLB (cor IFC + noise posicional cozido
+       em Python) — aqui só definimos as propriedades PBR.
+       Glass: transparente + reflexivo.  Sólidos: roughness por tipo.
     ──────────────────────────────────────────────────────────────── */
-    function makeValueNoise(size, cell) {
-      const GS   = Math.ceil(size / cell) + 2;
-      const grid = new Float32Array(GS * GS);
-      for (let i = 0; i < grid.length; i++) grid[i] = Math.random();
-      const g = (gx, gy) =>
-        grid[Math.min(GS-1, Math.max(0,gy)) * GS + Math.min(GS-1, Math.max(0,gx))];
-
-      const px = size * size * 4;
-      const img = new Uint8ClampedArray(px);
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const gx = x / cell, gy = y / cell;
-          const gxi = Math.floor(gx), gyi = Math.floor(gy);
-          const fx = gx - gxi, fy = gy - gyi;
-          const sx = fx*fx*(3-2*fx), sy = fy*fy*(3-2*fy);
-          const v  = g(gxi,gyi)*(1-sx)*(1-sy) + g(gxi+1,gyi)*sx*(1-sy)
-                   + g(gxi,gyi+1)*(1-sx)*sy   + g(gxi+1,gyi+1)*sx*sy;
-          const c = Math.round(v * 255);
-          const i = (y * size + x) * 4;
-          img[i] = img[i+1] = img[i+2] = c; img[i+3] = 255;
-        }
-      }
-      const cvs = document.createElement('canvas');
-      cvs.width = cvs.height = size;
-      cvs.getContext('2d').putImageData(new ImageData(img, size, size), 0, 0);
-      const t = new THREE.CanvasTexture(cvs);
-      t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      return t;
-    }
-
-    /* Noise em 3 oitavas — textura final para triplanar */
-    function makeMultiNoise(size) {
-      const a = makeValueNoise(size, 24);  // baixa freq
-      const b = makeValueNoise(size, 8);   // média freq
-      const c = makeValueNoise(size, 3);   // alta freq (grão fino)
-      /* combina as 3 oitavas num único canvas */
-      const cv  = document.createElement('canvas');
-      cv.width  = cv.height = size;
-      const ctx = cv.getContext('2d');
-      ctx.drawImage(a.image, 0, 0);
-      ctx.globalAlpha = 0.45; ctx.drawImage(b.image, 0, 0);
-      ctx.globalAlpha = 0.20; ctx.drawImage(c.image, 0, 0);
-      ctx.globalAlpha = 1.0;
-      const t = new THREE.CanvasTexture(cv);
-      t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      /* Descarta texturas intermediárias */
-      a.dispose(); b.dispose(); c.dispose();
-      return t;
-    }
-
-    const _surfaceTex = makeMultiNoise(128);
-
-    /* ── Triplanar UV via onBeforeCompile ──────────────────────────
-       Injeta posição world no vertex shader e faz blending triplanar
-       no fragment para modular cor e roughness sem UVs no modelo.
-    ──────────────────────────────────────────────────────────────── */
-    function applyTriplanar(mat, tex, scale) {
-      mat.onBeforeCompile = function(shader) {
-        shader.uniforms.triMap   = { value: tex };
-        shader.uniforms.triScale = { value: scale };
-
-        /* Vertex: passa posição world como varying */
-        shader.vertexShader = 'varying vec3 vWorldPos;\n' + shader.vertexShader;
-        shader.vertexShader = shader.vertexShader.replace(
-          '#include <project_vertex>',
-          '#include <project_vertex>\nvWorldPos=(modelMatrix*vec4(transformed,1.0)).xyz;'
-        );
-
-        /* Fragment: uniformes + varying */
-        shader.fragmentShader =
-          'varying vec3 vWorldPos;\nuniform sampler2D triMap;\nuniform float triScale;\n'
-          + shader.fragmentShader;
-
-        /* Calcula triN imediatamente após diffuseColor (antes de color_fragment) */
-        shader.fragmentShader = shader.fragmentShader.replace(
-          'vec4 diffuseColor = vec4( diffuse, opacity );',
-          `vec4 diffuseColor = vec4( diffuse, opacity );
-           vec3 _tw = abs(vNormal);
-           _tw = pow(_tw, vec3(3.0));
-           _tw /= (_tw.x + _tw.y + _tw.z + 1e-4);
-           float triN =
-             texture2D(triMap, vWorldPos.yz * triScale).r * _tw.x +
-             texture2D(triMap, vWorldPos.xz * triScale).r * _tw.y +
-             texture2D(triMap, vWorldPos.xy * triScale).r * _tw.z;`
-        );
-
-        /* Modula cor: ±18% variação de luminosidade (textura visível) */
-        shader.fragmentShader = shader.fragmentShader.replace(
-          '#include <color_fragment>',
-          '#include <color_fragment>\ndiffuseColor.rgb *= (0.82 + triN * 0.36);'
-        );
-
-        /* Modula roughness: superfícies com variação micro-geométrica */
-        shader.fragmentShader = shader.fragmentShader.replace(
-          '#include <roughnessmap_fragment>',
-          '#include <roughnessmap_fragment>\nroughnessFactor=clamp(roughnessFactor*(0.60+triN*0.80),0.0,1.0);'
-        );
-      };
-      mat.customProgramCacheKey = () => 'triplanar_' + scale;
-    }
-
-    /* Cache de materiais por categoria (reutiliza instância) */
     const matCache = {};
     function getMat(cat) {
       if (matCache[cat]) return matCache[cat];
       const p = CAT_PBR[cat] || CAT_PBR.default;
-      const m = new THREE.MeshStandardMaterial({
-        vertexColors    : true,
+      matCache[cat] = new THREE.MeshStandardMaterial({
+        vertexColors    : true,   /* usa COLOR_0 do GLB (cor IFC + noise) */
         roughness       : p.roughness,
         metalness       : p.metalness,
         transparent     : p.transparent,
         opacity         : p.opacity,
+        depthWrite      : !p.transparent,
         side            : THREE.DoubleSide,
-        envMapIntensity : 1.3,
+        envMapIntensity : 1.4,
       });
-      /* Aplica textura triplanar em materiais sólidos (não vidro) */
-      if (!p.transparent) applyTriplanar(m, _surfaceTex, 1.6);
-      matCache[cat] = m;
-      return m;
+      return matCache[cat];
     }
 
     ifcModel.traverse(c => {
