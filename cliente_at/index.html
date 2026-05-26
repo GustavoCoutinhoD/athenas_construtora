@@ -4618,10 +4618,10 @@
   }
   </script>
 
-  <!-- ══ 3D RESIDENCIAL — Módulo principal ══════════════════════ -->
+  <!-- ══ 3D RESIDENCIAL — IFC via web-ifc-three ════════════════ -->
   <script type="module">
   import * as THREE from 'three';
-  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { IFCLoader } from 'https://esm.sh/web-ifc-three@0.0.136?external=three';
 
   /* ── Só inicializa quando a seção entrar na tela ── */
   const _triggerEl = document.getElementById('sobre');
@@ -4683,8 +4683,6 @@
     scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a2e, 0.7));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
-    const loader  = new GLTFLoader();
-    const loadGLB = url => new Promise((res, rej) => loader.load(url, res, undefined, rej));
     const getBox  = m  => new THREE.Box3().setFromObject(m);
     const getSize = b  => { const v = new THREE.Vector3(); b.getSize(v); return v; };
     const getCtr  = b  => { const v = new THREE.Vector3(); b.getCenter(v); return v; };
@@ -4736,32 +4734,93 @@
       return animateValue(from, to, ms, function(v) { overlay.style.opacity = v; });
     }
 
-    /* ── Carrega todos os modelos em paralelo ────────────────── */
-    var resM, baseM, meioM, telhadoM;
+    /* ── Carrega modelo IFC ─────────────────────────────────── */
+    if (hint) {
+      hint.style.display = 'flex';
+      hint.style.opacity = '0.55';
+      hint.textContent   = '⟳ Carregando modelo 3D...';
+    }
+
+    const ifcLoader = new IFCLoader();
+    await ifcLoader.ifcManager.setWasmPath(
+      'https://cdn.jsdelivr.net/npm/web-ifc@0.0.36/'
+    );
+
+    let ifcModel;
     try {
-      const [rg, bg, mg, tg] = await Promise.all([
-        loadGLB('3D/residencial.glb'),
-        loadGLB('3D/base_projeto_residencial.glb'),
-        loadGLB('3D/meio_projeto_residencial.glb'),
-        loadGLB('3D/telhado_projeto_residencial.glb'),
-      ]);
-      resM     = rg.scene;
-      baseM    = bg.scene;
-      meioM    = mg.scene;
-      telhadoM = tg.scene;
+      ifcModel = await new Promise((res, rej) =>
+        ifcLoader.load('3d/residencial_definitivo.ifc', res, undefined, rej)
+      );
     } catch (err) {
-      console.error('[3D Residencial] Falha ao carregar modelos:', err);
+      console.error('[3D IFC] Falha ao carregar:', err);
+      if (hint) { hint.textContent = '✕ Erro ao carregar modelo'; }
       return;
     }
 
-    [resM, baseM, meioM, telhadoM].forEach(function(m) {
-      m.traverse(function(c) { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
-    });
+    ifcModel.castShadow    = true;
+    ifcModel.receiveShadow = true;
 
-    /* ── Grupo A: modelo único residencial.glb ────────────────── */
-    centerXZ(resM);
+    /* ── Divide geometria em 3 camadas por Y ──────────────────
+       base (0–33 %) · meio (33–66 %) · telhado (66–100 %)
+    ─────────────────────────────────────────────────────────── */
+    function splitGeometryByY(src) {
+      const geo = src.geometry;
+      geo.computeBoundingBox();
+      const { min, max } = geo.boundingBox;
+      const h  = max.y - min.y;
+      const y1 = min.y + h * 0.33;
+      const y2 = min.y + h * 0.66;
+
+      const pos    = geo.attributes.position;
+      const col    = geo.attributes.color;
+      const nor    = geo.attributes.normal;
+      const idxArr = geo.index ? geo.index.array : null;
+      const triN   = idxArr ? idxArr.length / 3 : pos.count / 3;
+      const colSz  = col ? col.itemSize : 0;
+
+      const buckets = [[], [], []];
+      for (let t = 0; t < triN; t++) {
+        const i0 = idxArr ? idxArr[t*3]   : t*3;
+        const i1 = idxArr ? idxArr[t*3+1] : t*3+1;
+        const i2 = idxArr ? idxArr[t*3+2] : t*3+2;
+        const cy = (pos.getY(i0) + pos.getY(i1) + pos.getY(i2)) / 3;
+        buckets[cy < y1 ? 0 : cy < y2 ? 1 : 2].push(i0, i1, i2);
+      }
+
+      const baseMat = Array.isArray(src.material) ? src.material[0] : src.material;
+
+      return buckets.map(tris => {
+        const vMap = new Map();
+        const nPos = [], nCol = [], nNor = [], nIdx = [];
+        for (const vi of tris) {
+          if (!vMap.has(vi)) {
+            const nv = nPos.length / 3;
+            vMap.set(vi, nv);
+            nPos.push(pos.getX(vi), pos.getY(vi), pos.getZ(vi));
+            if (colSz) for (let c = 0; c < colSz; c++) nCol.push(col.array[vi * colSz + c]);
+            if (nor)   nNor.push(nor.getX(vi), nor.getY(vi), nor.getZ(vi));
+          }
+          nIdx.push(vMap.get(vi));
+        }
+        const newGeo = new THREE.BufferGeometry();
+        newGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nPos), 3));
+        if (nCol.length) newGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nCol), colSz));
+        if (nNor.length) newGeo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nNor), 3));
+        newGeo.setIndex(nIdx);
+        const mat = baseMat ? baseMat.clone() : new THREE.MeshLambertMaterial({ vertexColors: true });
+        if (nCol.length) mat.vertexColors = true;
+        const m = new THREE.Mesh(newGeo, mat);
+        m.castShadow = m.receiveShadow = true;
+        return m;
+      });
+    }
+
+    const [baseM, meioM, telhadoM] = splitGeometryByY(ifcModel);
+
+    /* ── Grupo A: modelo completo IFC ─────────────────────────── */
+    centerXZ(ifcModel);
     const groupA = new THREE.Group();
-    groupA.add(resM);
+    groupA.add(ifcModel);
     const gcA = getCtr(getBox(groupA));
     groupA.position.y -= gcA.y;
 
@@ -4809,7 +4868,7 @@
     }
 
     /* ── Chão compartilhado ────────────────────────────────── */
-    const maxXZ = Math.max(...[resM, baseM, meioM, telhadoM].map(function(m) {
+    const maxXZ = Math.max(...[ifcModel, baseM, meioM, telhadoM].map(function(m) {
       var s = getSize(getBox(m)); return Math.max(s.x, s.z);
     }));
     const floor = new THREE.Mesh(
@@ -4821,7 +4880,7 @@
     scene.add(floor);
 
     /* ── Estado global ──────────────────────────────────────── */
-    /*  'A'        — exibindo groupA (residencial.glb)
+    /*  'A'        — exibindo groupA (residencial_definitivo.ifc)
         'EXPLODED' — exibindo groupB explodido
         'BUSY'     — transição em curso (cliques ignorados)    */
     let state    = 'A';
