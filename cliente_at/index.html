@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -24,7 +24,7 @@
   <meta property="og:title" content="ATHENAS Construtora | Arquitetura, BIM e Projetos Residenciais em SP">
   <meta property="og:description" content="Escritório de arquitetura e construtora especializado em projetos residenciais e comerciais, compatibilização BIM, plantas hidráulicas, maquete 3D, automação e sistemas hidrossanitários. Atendemos São Paulo e região.">
   <meta property="og:url" content="https://athenasconstrutora.com.br/">
-  <meta property="og:image" content="https://athenasconstrutora.com.br/imagens/background_header.png">
+  <meta property="og:image" content="https://athenasconstrutora.com.br/imagens/background_header.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="ATHENAS Construtora - Arquitetura e BIM em São Paulo">
@@ -34,7 +34,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="ATHENAS Construtora | Arquitetura e BIM em São Paulo">
   <meta name="twitter:description" content="Especialistas em projetos residenciais, BIM, maquete 3D, plantas hidráulicas e elétricas. Contrate o melhor arquiteto para o seu projeto.">
-  <meta name="twitter:image" content="https://athenasconstrutora.com.br/imagens/background_header.png">
+  <meta name="twitter:image" content="https://athenasconstrutora.com.br/imagens/background_header.jpg">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,6 +48,30 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.428.0/font/lucide.min.css"/>
 
   <style>
+    /* ─── MODO PERFORMANCE (PCs antigos) ───────────────────── */
+    /* Adicionado via JS quando hardwareConcurrency <= 4 ou deviceMemory <= 4 */
+    body.perf-mode .lamp-glow-main,
+    body.perf-mode .lamp-beam,
+    body.perf-mode .lamp-cone-left-inner,
+    body.perf-mode .lamp-cone-right-inner,
+    body.perf-mode .ts-glow-orb,
+    body.perf-mode .ts-img-glow,
+    body.perf-mode .cardstack-spotlight-top,
+    body.perf-mode .cardstack-spotlight-bot { filter: none !important; display: none !important; }
+
+    body.perf-mode .pdf-download-card,
+    body.perf-mode .galeria-btn { backdrop-filter: none !important; }
+
+    body.perf-mode #header.scrolled { backdrop-filter: none !important; }
+
+    /* Desativa will-change em massa (libera memória GPU) */
+    body.perf-mode * { will-change: auto !important; }
+
+    /* Animações de entrada mais simples (só opacidade, sem movimento) */
+    body.perf-mode .reveal,
+    body.perf-mode .reveal-left,
+    body.perf-mode .reveal-right { transform: none !important; opacity: 1 !important; }
+
     /* ─── RESET & BASE ──────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2899,7 +2923,7 @@
           "width": 400,
           "height": 200
         },
-        "image": "https://athenasconstrutora.com.br/imagens/background_header.png",
+        "image": "https://athenasconstrutora.com.br/imagens/background_header.jpg",
         "description": "Escritório de arquitetura e construtora especializado em projetos residenciais e comerciais, compatibilização BIM, plantas hidráulicas, plantas elétricas, maquete 3D, automação residencial e sistemas hidrossanitários.",
         "priceRange": "$$",
         "telephone": "+55-11-99999-9999",
@@ -3368,7 +3392,7 @@
             <a href="imagens/foto_5.jpeg" class="galeria-item"><img src="imagens/foto_5.jpeg" alt="Modelagem 3D e maquete virtual de projeto residencial ATHENAS" loading="lazy"/><div class="galeria-overlay"></div></a>
             <a href="imagens/foto_6.jpeg" class="galeria-item"><img src="imagens/foto_6.jpeg" alt="Obra de projeto comercial ATHENAS - arquitetura e consultoria técnica" loading="lazy"/><div class="galeria-overlay"></div></a>
             <a href="imagens/foto_7.jpeg" class="galeria-item"><img src="imagens/foto_7.jpeg" alt="Automação residencial e sistemas elétricos - ATHENAS Construtora São Paulo" loading="lazy"/><div class="galeria-overlay"></div></a>
-            <a href="imagens/foto_8.png"  class="galeria-item"><img src="imagens/foto_8.png"  alt="Projeto executivo completo com plantas hidráulicas e elétricas - ATHENAS" loading="lazy"/><div class="galeria-overlay"></div></a>
+            <a href="imagens/foto_8.jpg"  class="galeria-item"><img src="imagens/foto_8.jpg"  alt="Projeto executivo completo com plantas hidráulicas e elétricas - ATHENAS" loading="lazy"/><div class="galeria-overlay"></div></a>
           </div>
         </div>
         <div class="galeria-nav">
@@ -3773,6 +3797,24 @@
   <!-- Lenis smooth scroll -->
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
+
+    // ══ DETECÇÃO DE PC LENTO ════════════════════════════════
+    (function detectPerformance() {
+      var cores = navigator.hardwareConcurrency || 4;
+      var ram   = navigator.deviceMemory || 4;
+      if (cores <= 4 || ram <= 4) {
+        document.body.classList.add('perf-mode');
+
+        /* Pausa o vídeo hero e remove autoplay pesado */
+        var vid = document.getElementById('hero-video');
+        if (vid) {
+          vid.pause();
+          vid.removeAttribute('autoplay');
+          vid.style.display = 'none';
+          /* Fallback: fundo escuro sólido já definido no CSS do #hero */
+        }
+      }
+    })();
 
     // ══ TYPEWRITER HERO ══════════════════════════════════════
     (function initTypewriter() {
