@@ -4796,76 +4796,73 @@
       return;
     }
 
+    /* ── Propriedades PBR por categoria (nome do mesh: "base_glass", etc.) ── */
+    const CAT_PBR = {
+      glass:    { roughness: 0.04, metalness: 0.10, transparent: true,  opacity: 0.35 },
+      metal:    { roughness: 0.25, metalness: 0.85, transparent: false, opacity: 1.0  },
+      wood:     { roughness: 0.82, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      concrete: { roughness: 0.95, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      brick:    { roughness: 0.88, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      tile:     { roughness: 0.30, metalness: 0.02, transparent: false, opacity: 1.0  },
+      default:  { roughness: 0.72, metalness: 0.02, transparent: false, opacity: 1.0  },
+    };
+
+    /* Cache de materiais por categoria (reutiliza instância) */
+    const matCache = {};
+    function getMat(cat) {
+      if (matCache[cat]) return matCache[cat];
+      const p = CAT_PBR[cat] || CAT_PBR.default;
+      matCache[cat] = new THREE.MeshStandardMaterial({
+        vertexColors    : true,
+        roughness       : p.roughness,
+        metalness       : p.metalness,
+        transparent     : p.transparent,
+        opacity         : p.opacity,
+        side            : THREE.DoubleSide,
+        envMapIntensity : 1.3,
+      });
+      return matCache[cat];
+    }
+
     ifcModel.traverse(c => {
       if (!c.isMesh) return;
       c.castShadow = c.receiveShadow = true;
-
-      /* Garante normais do GLB */
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
 
-      const mats = Array.isArray(c.material) ? c.material : [c.material];
-      const result = mats.map(src => {
-        if (!src) return src;
-
-        if (src.isMeshBasicMaterial || src.isMeshLambertMaterial) {
-          /* único caso que faz upgrade — Basic/Lambert não respondem à luz IBL */
-          const useVC = src.vertexColors || !!c.geometry.attributes.color;
-          return new THREE.MeshStandardMaterial({
-            vertexColors : useVC,
-            color        : useVC ? 0xffffff : src.color,
-            roughness    : 0.72,
-            metalness    : 0.02,
-            side         : THREE.DoubleSide,
-          });
-        }
-
-        /* MeshStandardMaterial do GLB já tem PBR correto do Python (vidro, metal, etc.)
-           — só garante DoubleSide e envMapIntensity para o IBL */
-        src.side             = THREE.DoubleSide;
-        src.envMapIntensity  = 1.2;
-        src.needsUpdate      = true;
-        return src;
-      });
-      c.material = Array.isArray(c.material) ? result : result[0];
+      /* Lê categoria do nome do mesh: "base_glass" → "glass" */
+      const meshName = c.name || (c.parent && c.parent.name) || '';
+      const cat      = meshName.split('_')[1] || 'default';
+      c.material     = getMat(CAT_PBR[cat] ? cat : 'default');
     });
 
     /* ── Corrige eixo: IFC=Z-up → Three.js=Y-up ──────────────── */
-    ifcModel.rotation.x = -Math.PI / 2;   /* levanta o modelo */
-    ifcModel.rotation.z =  Math.PI;       /* frente da casa voltada para o usuário */
+    ifcModel.rotation.x = -Math.PI / 2;
+    ifcModel.rotation.z =  Math.PI;
     ifcModel.updateMatrixWorld(true);
 
-    /* ── Divide cena GLB em 3 camadas por Y ──────────────────────
-       Ordena todos os meshes por centro Y → divide em 3 grupos
-       base (1/3 inferior) · meio · telhado (1/3 superior)
+    /* ── Divide cena em 3 bandas pelo nome do mesh ────────────────
+       Python nomeou: "base_*", "meio_*", "telhado_*"
+       → 6 meshes viram 3 grupos de 2 (sem loop de sort em 762 objetos)
     ─────────────────────────────────────────────────────────── */
-    function splitSceneByY(root) {
-      const items = [];
+    function splitByBandName(root) {
+      const bandMap = { base: 0, meio: 1, telhado: 2 };
+      const groups  = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
       root.updateWorldMatrix(true, true);
       root.traverse(c => {
         if (!c.isMesh) return;
-        const bb = new THREE.Box3().setFromObject(c);
-        const cy = (bb.min.y + bb.max.y) / 2;
-        items.push({ mesh: c, cy });
-      });
-      if (!items.length) return [new THREE.Group(), new THREE.Group(), new THREE.Group()];
-      items.sort((a, b) => a.cy - b.cy);
-      const n  = items.length;
-      const c1 = Math.floor(n / 3);
-      const c2 = Math.floor(n * 2 / 3);
-      const groups = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
-      [items.slice(0, c1), items.slice(c1, c2), items.slice(c2)].forEach((slice, gi) => {
-        slice.forEach(({ mesh }) => {
-          const m = new THREE.Mesh(mesh.geometry, mesh.material);
-          m.matrix.copy(mesh.matrixWorld);
-          m.matrixAutoUpdate = false;
-          m.castShadow = m.receiveShadow = true;
-          groups[gi].add(m);
-        });
+        const name = c.name || (c.parent && c.parent.name) || '';
+        const band = name.split('_')[0];
+        const idx  = bandMap[band] !== undefined ? bandMap[band] : 1;
+        const m    = new THREE.Mesh(c.geometry, c.material);
+        m.matrix.copy(c.matrixWorld);
+        m.matrixAutoUpdate = false;
+        m.castShadow = m.receiveShadow = true;
+        groups[idx].add(m);
       });
       return groups;
     }
 
-    const [baseM, meioM, telhadoM] = splitSceneByY(ifcModel);
+    const [baseM, meioM, telhadoM] = splitByBandName(ifcModel);
 
     /* ── Grupo A: modelo completo IFC ─────────────────────────── */
     centerXZ(ifcModel);
