@@ -3058,7 +3058,7 @@
 
   <!-- ══ HERO ANIMATED ════════════════════════════════════════ -->
   <section id="hero">
-    <video id="hero-video" autoplay muted loop playsinline preload="auto">
+    <video id="hero-video" autoplay muted loop playsinline preload="metadata">
       <source src="background_athenas.mp4" type="video/mp4">
     </video>
     <div id="beams-overlay"></div>
@@ -4639,7 +4639,19 @@
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-  (async function init3DResidencial() {
+  /* ── Só inicializa quando a seção entrar na tela ── */
+  const _triggerEl = document.getElementById('sobre');
+  if (_triggerEl) {
+    const _obs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        _obs.disconnect();
+        init3DResidencial();
+      }
+    }, { rootMargin: '200px' });
+    _obs.observe(_triggerEl);
+  }
+
+  async function init3DResidencial() {
 
     const canvas = document.getElementById('ts-3d-canvas');
     const imgEl  = document.getElementById('ts-main-img');
@@ -4678,7 +4690,7 @@
     const sun = new THREE.DirectionalLight(0xfff5e0, 3.5);
     sun.position.set(20, 40, 20);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(1024, 1024);
     sun.shadow.bias = -0.0005;
     scene.add(sun);
     const fillLight = new THREE.DirectionalLight(0xaac4ff, 0.9);
@@ -5060,7 +5072,7 @@
     window.addEventListener('resize', resize);
     tick();
 
-  })();
+  }
   </script>
 
 
