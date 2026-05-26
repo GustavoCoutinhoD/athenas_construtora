@@ -1939,11 +1939,19 @@
       margin-bottom: 0;
     }
 
+    .bim-hero .container {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding-left: 7%;
+      padding-right: 0;
+    }
+
     .bim-hero-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
+      grid-template-columns: minmax(300px, 420px) 1fr;
+      gap: 40px;
+      align-items: start;
     }
 
     .bim-hero-text .tag { color: var(--gold); }
@@ -1955,6 +1963,7 @@
       line-height: 1.1;
       color: var(--navy);
       margin-bottom: 20px;
+      white-space: nowrap;
     }
 
     .bim-hero-title span { color: var(--gold); }
@@ -3476,9 +3485,10 @@
             </div>
           </div>
 
-          <!-- Globo BIM -->
-          <div class="bim-visual reveal" style="display:flex;align-items:center;justify-content:center;">
-            <canvas id="bim-globe-canvas" style="width:100%;max-width:420px;height:420px;display:block;"></canvas>
+          <!-- 3D BIM -->
+          <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
+            <canvas id="bim-3d-canvas" style="height:600px;display:block;border-radius:16px;cursor:crosshair;box-shadow:0 20px 60px rgba(0,0,0,.1);margin-left:100px;margin-right:100px;margin-top:125px;width:calc(100% - 200px);"></canvas>
+            <div id="bim-3d-hint" style="margin-top:14px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">🖱 Clique para ver em 3 partes &nbsp;·&nbsp; Btn. direito para girar</div>
           </div>
 
         </div>
@@ -4617,68 +4627,44 @@
   }
   </script>
 
-  <!-- ══ Canvas-visibility controller (independente do módulo 3D) ══ -->
-  <script>
-  (function() {
-    function syncCanvas() {
-      var active = document.querySelector('#sobre .ts-nav-item.active');
-      var img    = document.getElementById('ts-main-img');
-      var canvas = document.getElementById('ts-3d-canvas');
-      var glow   = document.getElementById('ts-img-glow');
-      if (!img || !canvas) return;
-      var is3D = active && parseInt(active.dataset.index) === 4;  /* MAQUETE 3D */
-      img.style.display    = is3D ? 'none'  : '';
-      canvas.style.display = is3D ? 'block' : 'none';
-      /* Oculta o halo de glow no modo 3D — o canvas tem sua própria iluminação */
-      if (glow) glow.style.opacity = is3D ? '0' : '';
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      syncCanvas();
-      document.querySelectorAll('#sobre .ts-nav-item').forEach(function(el) {
-        new MutationObserver(syncCanvas).observe(el, { attributes: true, attributeFilter: ['class'] });
-      });
-    });
-  })();
-  </script>
 
-  <!-- ══ 3D MAQUETE — GLB (convertido do IFC Revit) ══════════════ -->
+  <!-- ══ 3D BIM — GLB (convertido do IFC Revit) ══════════════ -->
   <script type="module">
   import * as THREE from 'three';
   import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
   import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-  /* ── Só inicializa quando a seção entrar na tela ── */
-  const _triggerEl = document.getElementById('sobre');
+  /* ── Só inicializa quando o canvas BIM entrar na tela ── */
+  const _triggerEl = document.getElementById('bim-3d-canvas');
   if (_triggerEl) {
     const _obs = new IntersectionObserver(function(entries) {
       if (entries[0].isIntersecting) {
         _obs.disconnect();
-        init3DResidencial();
+        initBim3D();
       }
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '300px' });
     _obs.observe(_triggerEl);
   }
 
-  async function init3DResidencial() {
+  async function initBim3D() {
 
-    const canvas = document.getElementById('ts-3d-canvas');
-    const imgEl  = document.getElementById('ts-main-img');
-    const wrap   = document.getElementById('ts-img-wrap');
-    const hint   = document.getElementById('ts-3d-hint');
-    if (!canvas || !imgEl || !wrap) return;
+    const canvas = document.getElementById('bim-3d-canvas');
+    const hint   = document.getElementById('bim-3d-hint');
+    if (!canvas) return;
 
     /* ── Overlay de transição (fade entre modos) ──────────── */
     const overlay = document.createElement('div');
     overlay.style.cssText = [
       'position:absolute', 'inset:0',
       'background:rgba(6,8,16,0.97)',
-      'border-radius:18px',
+      'border-radius:16px',
       'opacity:0',
       'pointer-events:none',
       'z-index:6',
       'transition:none'
     ].join(';');
-    wrap.appendChild(overlay);
+    canvas.parentElement.style.position = 'relative';
+    canvas.parentElement.appendChild(overlay);
 
     /* ── Renderer ────────────────────────────────────── */
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -5120,54 +5106,19 @@
       renderer.render(scene, camera);
     }
 
-    /* ── Show / Hide (integração showcase) ─────────────────────── */
-    function show() {
-      imgEl.style.display   = 'none';
-      canvas.style.display  = 'block';
-      overlay.style.opacity = '0';
-      if (hint) {
-        hint.style.display    = 'flex';
-        hint.style.transition = 'none';
-        hint.style.opacity    = '0.55';
-        hint.textContent      = '🖱 Clique para ver em 3 partes';
-      }
-      visible = true;
-      fitCamera(groupA);
-      resize();
-      if (!rafId) tick();
-    }
+    /* ── Inicializa e renderiza imediatamente ───────────────────── */
+    fitCamera(groupA);
+    resize();
+    visible = true;
+    tick();
 
-    function hide() {
-      canvas.style.display  = 'none';
-      overlay.style.opacity = '0';
-      if (hint) hint.style.display = 'none';
-      visible = false;
-      /* força reset completo independente do estado atual */
-      setParts(0);
-      scene.remove(groupB);
-      if (!scene.children.includes(groupA)) scene.add(groupA);
-      state      = 'A';
-      targetFOV  = baseFOV;
-      rotX       = 0;
-      isDragging = false;
-      canvas.style.cursor = 'crosshair';
-      imgEl.style.display = '';
-    }
-
-    /* ── MutationObserver: detecta nav ativa no showcase ─────────── */
-    const mo = new MutationObserver(function() {
-      const active = document.querySelector('#sobre .ts-nav-item.active');
-      parseInt(active?.dataset?.index) === 4 ? show() : hide();  /* MAQUETE 3D */
-    });
-    document.querySelectorAll('#sobre .ts-nav-item').forEach(function(ni) {
-      mo.observe(ni, { attributes: true, attributeFilter: ['class'] });
-    });
-
-    const ini = document.querySelector('#sobre .ts-nav-item.active');
-    if (parseInt(ini?.dataset?.index) === 4) show();  /* MAQUETE 3D */
+    /* ── Pausa quando fora da tela (performance) ─────────────────── */
+    const visObs = new IntersectionObserver(function(entries) {
+      visible = entries[0].isIntersecting;
+    }, { threshold: 0.05 });
+    visObs.observe(canvas);
 
     window.addEventListener('resize', resize);
-    tick();
 
     /* ── Pausa render loop quando aba não está ativa ── */
     document.addEventListener('visibilitychange', function() {
@@ -5177,78 +5128,6 @@
   }
   </script>
 
-  <!-- ══ GLOBO BIM — ES module (compartilha Three.js, sem duplicata) ══ -->
-  <script type="module">
-  import * as THREE from 'three';
-
-  (function initBimGlobe() {
-    var canvas = document.getElementById('bim-globe-canvas');
-    if (!canvas) return;
-
-    /* Detecção de dispositivo lento */
-    var cores      = navigator.hardwareConcurrency || 4;
-    var ram        = navigator.deviceMemory || 4;
-    var slowDevice = (cores <= 2 || ram <= 2);
-    var FPS_LIMIT  = slowDevice ? 20 : 30;   /* cap de fps — globe não precisa de 60 */
-    var FRAME_MS   = 1000 / FPS_LIMIT;
-    var lastTime   = 0;
-    var isVisible  = false;
-    var rafId      = null;
-
-    var W = canvas.offsetWidth  || 320;
-    var H = canvas.offsetHeight || 320;
-
-    var renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: false,     /* wireframe não precisa de antialias */
-      alpha: true
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(W, H);
-    renderer.setClearColor(0x000000, 0);
-
-    var scene  = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
-    camera.position.z = 2.8;
-
-    /* Geometria reduzida (22 seg vs 36 — visualmente idêntico) */
-    var geo  = new THREE.SphereGeometry(1, 22, 22);
-    var mat  = new THREE.MeshBasicMaterial({ color: 0xC89B3C, wireframe: true, transparent: true, opacity: 0.22 });
-    var globe = new THREE.Mesh(geo, mat);
-    scene.add(globe);
-
-    var glowGeo = new THREE.SphereGeometry(0.97, 18, 18);
-    var glowMat = new THREE.MeshBasicMaterial({ color: 0x163558, transparent: true, opacity: 0.08 });
-    scene.add(new THREE.Mesh(glowGeo, glowMat));
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-
-    function animate(now) {
-      rafId = requestAnimationFrame(animate);
-      if (!isVisible || document.hidden) return;          /* pausa quando invisível */
-      if (now - lastTime < FRAME_MS) return;              /* limita fps */
-      lastTime = now;
-      globe.rotation.y += 0.004;
-      globe.rotation.x += 0.001;
-      renderer.render(scene, camera);
-    }
-
-    /* Só processa quando a seção BIM está na tela */
-    var obs = new IntersectionObserver(function(entries) {
-      isVisible = entries[0].isIntersecting;
-    }, { threshold: 0.05 });
-    obs.observe(canvas);
-
-    window.addEventListener('resize', function() {
-      var w = canvas.offsetWidth || 320;
-      var h = canvas.offsetHeight || 320;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    });
-
-    animate(0);
-  })();
-  </script>
 
 
 </body>

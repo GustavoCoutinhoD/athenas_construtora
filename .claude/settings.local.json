@@ -5,7 +5,20 @@
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 5)",
       "PowerShell(Start-Process powershell -ArgumentList \"-NoProfile -Command `\"cd 'C:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Athenas\\\\athenas'; python -m http.server 3000`\"\" -WindowStyle Normal)",
       "PowerShell(Start-Process \"http://localhost:3000\")",
-      "PowerShell(ls \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Athenas\\\\athenas\\\\\")"
+      "PowerShell(ls \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Athenas\\\\athenas\\\\\")",
+      "PowerShell(Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\"; python -m http.server 8080')",
+      "PowerShell(Start-Sleep -Seconds 2; try { $r = Invoke-WebRequest -Uri 'http://localhost:8080' -UseBasicParsing -TimeoutSec 5; \"Status: $\\($r.StatusCode\\)\" } catch { $_.Exception.Message })",
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force -Confirm:$false; Start-Sleep -Milliseconds 500; Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\"; python -m http.server 8080')",
+      "PowerShell(Start-Sleep -Seconds 2; try { $r = Invoke-WebRequest -Uri 'http://localhost:8080/3D/base_projeto_residencial.glb' -UseBasicParsing -TimeoutSec 5; \"Status GLB: $\\($r.StatusCode\\)\" } catch { $_.Exception.Message })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri 'http://localhost:8080' -UseBasicParsing -TimeoutSec 5; \"Status: $\\($r.StatusCode\\)\" } catch { \"Servidor offline: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(Invoke-WebRequest -Uri 'http://localhost:8080/3D/' -UseBasicParsing -TimeoutSec 5)",
+      "PowerShell(Stop-Process -Force -Confirm:$false)",
+      "PowerShell(Start-Process powershell -ArgumentList '-NoExit', '-Command', 'Set-Location \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\"; python -m http.server 8080'; Start-Sleep -Seconds 3; try { $r = Invoke-WebRequest -Uri \"http://localhost:8080/3D/base_projeto_residencial.glb\" -UseBasicParsing -TimeoutSec 5; \"GLB OK: $\\($r.StatusCode\\) — $\\($r.RawContentLength\\) bytes\" } catch { $_.Exception.Message })",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 _patch_3d.py)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\\\\_patch_3d.py\" -Force)",
+      "PowerShell(Start-Process python -ArgumentList '-m', 'http.server', '8080' -WorkingDirectory \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\")",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing)"
     ]
   }
 }
