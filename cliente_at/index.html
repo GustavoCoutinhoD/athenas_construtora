@@ -2732,7 +2732,7 @@
       border-radius: 18px;
       box-shadow: 0 50px 120px rgba(0,0,0,.8), 0 12px 40px rgba(0,0,0,.5);
       cursor: crosshair;
-      background: transparent;
+      background: #060810;
     }
 
     #ts-3d-hint {
@@ -4734,7 +4734,12 @@
       return animateValue(from, to, ms, function(v) { overlay.style.opacity = v; });
     }
 
-    /* ── Carrega modelo IFC ─────────────────────────────────── */
+    /* ── Exibe canvas imediatamente — elimina imagem estática ── */
+    imgEl.style.display  = 'none';
+    canvas.style.display = 'block';
+    resize();
+
+    /* ── Hint de carregamento ─────────────────────────────── */
     if (hint) {
       hint.style.display = 'flex';
       hint.style.opacity = '0.55';
