@@ -4691,17 +4691,20 @@
     const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
 
     /* ── Iluminação ──────────────────────────────────────── */
-    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
-    const sun = new THREE.DirectionalLight(0xfff5e0, 3.5);
-    sun.position.set(20, 40, 20);
+    scene.add(new THREE.AmbientLight(0xffffff, 2.2));
+    const sun = new THREE.DirectionalLight(0xfff8e8, 4.5);
+    sun.position.set(25, 50, 30);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
-    sun.shadow.bias = -0.0005;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.bias = -0.0003;
     scene.add(sun);
-    const fillLight = new THREE.DirectionalLight(0xaac4ff, 0.9);
-    fillLight.position.set(-15, 10, -15);
+    const fillLight = new THREE.DirectionalLight(0xc8deff, 1.8);
+    fillLight.position.set(-20, 15, -20);
     scene.add(fillLight);
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a2e, 0.7));
+    const rimLight = new THREE.DirectionalLight(0xffeedd, 1.2);
+    rimLight.position.set(0, -5, -30);
+    scene.add(rimLight);
+    scene.add(new THREE.HemisphereLight(0xe8f4ff, 0x2a2a3e, 1.1));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -4724,8 +4727,8 @@
       const ctr  = getCtr(box);
       const maxD = Math.max(size.x, size.y, size.z);
       const fRad = camera.fov * Math.PI / 180;
-      const dist = (maxD / 2) / Math.tan(fRad / 2) * 2.4;
-      camera.position.set(dist * 0.60, dist * 0.42, dist * 0.92);
+      const dist = (maxD / 2) / Math.tan(fRad / 2) * 1.55;
+      camera.position.set(dist * 0.55, dist * 0.38, dist * 0.88);
       camera.lookAt(ctr);
       const hs = maxD * 1.2;
       Object.assign(sun.shadow.camera, { left:-hs, right:hs, bottom:-hs, top:hs, far: dist*4 });
@@ -4777,7 +4780,23 @@
     }
 
     ifcModel.traverse(c => {
-      if (c.isMesh) { c.castShadow = c.receiveShadow = true; }
+      if (!c.isMesh) return;
+      c.castShadow = c.receiveShadow = true;
+
+      /* Garante normais calculadas para sombreamento correto */
+      if (!c.geometry.attributes.normal) {
+        c.geometry.computeVertexNormals();
+      }
+
+      /* Eleva qualidade do material para PBR realista */
+      const mats = Array.isArray(c.material) ? c.material : [c.material];
+      mats.forEach(m => {
+        if (!m) return;
+        m.roughness      = 0.72;
+        m.metalness      = 0.06;
+        m.side           = THREE.DoubleSide;
+        m.needsUpdate    = true;
+      });
     });
 
     /* ── Corrige eixo: IFC=Z-up → Three.js=Y-up ──────────────── */
