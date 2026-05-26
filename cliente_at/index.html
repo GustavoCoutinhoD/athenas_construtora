@@ -3805,14 +3805,7 @@
       if (cores <= 4 || ram <= 4) {
         document.body.classList.add('perf-mode');
 
-        /* Pausa o vídeo hero e remove autoplay pesado */
-        var vid = document.getElementById('hero-video');
-        if (vid) {
-          vid.pause();
-          vid.removeAttribute('autoplay');
-          vid.style.display = 'none';
-          /* Fallback: fundo escuro sólido já definido no CSS do #hero */
-        }
+        /* Vídeo hero mantido rodando em todos os dispositivos */
       }
     })();
 
