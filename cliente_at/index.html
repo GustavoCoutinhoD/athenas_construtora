@@ -3487,7 +3487,7 @@
 
           <!-- 3D BIM -->
           <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
-            <canvas id="bim-3d-canvas" style="height:600px;display:block;border-radius:16px;cursor:crosshair;box-shadow:0 20px 60px rgba(0,0,0,.1);margin-left:100px;margin-right:100px;margin-top:125px;width:calc(100% - 200px);"></canvas>
+            <canvas id="bim-3d-canvas" style="height:600px;display:block;border-radius:16px;cursor:crosshair;box-shadow:0 20px 60px rgba(0,0,0,.1);margin-left:100px;margin-right:100px;margin-top:125px;width:calc(100% - 200px);background:#000;"></canvas>
             <div id="bim-3d-hint" style="margin-top:14px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">🖱 Clique para ver em 3 partes &nbsp;·&nbsp; Btn. direito para girar</div>
           </div>
 
@@ -4667,7 +4667,7 @@
     canvas.parentElement.appendChild(overlay);
 
     /* ── Renderer ────────────────────────────────────── */
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled   = true;
     renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
@@ -4677,6 +4677,7 @@
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
     const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
 
     /* ── Ambiente IBL (RoomEnvironment) — iluminação realista ── */
