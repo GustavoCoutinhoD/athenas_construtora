@@ -2773,23 +2773,32 @@
       .contato-form { padding: 28px; }
       .logo-slider-track img { height: 18px; }
     }
-    /* ─── 3D CANVAS MAQUETE ─────────────────────────────────── */
-    #ts-3d-canvas {
-      display: none;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      border-radius: 18px;
-      box-shadow: 0 50px 120px rgba(0,0,0,.8), 0 12px 40px rgba(0,0,0,.5);
-      cursor: crosshair;
+    /* ─── 3D CANVAS BIM ─────────────────────────────────────── */
+    .bim-3d-wrap {
+      position: relative;
       background: #060810;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 8px 24px rgba(0,0,0,0.35);
+      width: 100%;
+      max-width: 480px;
     }
 
-    #ts-3d-hint {
-      display: none;
+    #bim-3d-canvas {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      cursor: crosshair;
+      /* gradiente de céu: alpha:true no renderer deixa o CSS aparecer */
+      background: linear-gradient(180deg, #0e1e38 0%, #060d1c 55%, #030810 100%);
+    }
+
+    #bim-3d-hint {
       position: absolute;
-      bottom: 56px;
+      bottom: 14px;
       left: 0;
       right: 0;
+      display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
@@ -3541,14 +3550,12 @@
 
           </div>
 
-          <!-- 3D BIM -->
-          <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
-            <div style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;">
-              <canvas id="bim-3d-canvas" style="height:600px;display:block;width:100%;cursor:crosshair;background:#000;outline:none;border:none;vertical-align:bottom;"></canvas>
-              <!-- Vinheta para eliminar halo branco nas bordas -->
-              <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);pointer-events:none;z-index:5;"></div>
+          <!-- 3D BIM — maquete IFC (substitui globo dourado) -->
+          <div class="bim-visual reveal" style="display:flex;align-items:center;justify-content:center;">
+            <div class="bim-3d-wrap">
+              <canvas id="bim-3d-canvas"></canvas>
+              <div id="bim-3d-hint">⏬ Role o scroll para explodir</div>
             </div>
-            <div id="bim-3d-hint" style="margin-top:14px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">🖱 Clique para ver em 3 partes &nbsp;·&nbsp; Btn. direito para girar</div>
           </div>
 
         </div>
@@ -4731,12 +4738,13 @@
 
   <!-- ══ 3D BIM — GLB (convertido do IFC Revit) ══════════════ -->
   <script type="module">
-  import * as THREE from 'three';
+  import * as THREE          from 'three';
   import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
   import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
 
-  /* ── Só inicializa quando o canvas BIM entrar na tela ── */
-  const _triggerEl = document.getElementById('bim-3d-canvas');
+  /* ── Só inicializa quando a seção BIM entrar na tela ── */
+  const _triggerEl = document.getElementById('bim');
   if (_triggerEl) {
     const _obs = new IntersectionObserver(function(entries) {
       if (entries[0].isIntersecting) {
@@ -4773,41 +4781,44 @@
     renderer.setClearColor(0x000000, 1);
     renderer.shadowMap.enabled   = false;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
-    renderer.toneMapping         = THREE.LinearToneMapping;
-    renderer.toneMappingExposure = 0.85;
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.92;
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
 
-    /* ── Ambiente IBL desativado — usamos apenas luzes diretas ── */
-    scene.environment = null;
+    /* ── Ambiente IBL (RoomEnvironment) ─────────────────────── */
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+    pmrem.dispose();
 
-    /* ── Iluminação (IBL via RoomEnvironment + luzes diretas) ────── */
-    /* AmbientLight leve — IBL faz a maior parte do trabalho */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.08));
+    /* ── Iluminação arquitetônica — 3 pontos + IBL ──────────── */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.20));
 
-    /* Sol principal — sombra nítida */
-    const sun = new THREE.DirectionalLight(0xfff4e0, 1.6);
-    sun.position.set(25, 50, 30);
+    /* Sol (tarde / golden hour): ângulo dramático, sombras longas */
+    const sun = new THREE.DirectionalLight(0xffd580, 1.6);
+    sun.position.set(30, 45, 20);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.bias = -0.0003;
+    sun.shadow.bias   = -0.0004;
+    sun.shadow.radius = 3;          /* borda suave nas sombras */
     scene.add(sun);
 
-    /* Luz de preenchimento fria (céu) */
-    const fillLight = new THREE.DirectionalLight(0xb8d0ff, 0.7);
-    fillLight.position.set(-20, 20, -15);
+    /* Preenchimento frio (céu): ilumina fachada oposta ao sol */
+    const fillLight = new THREE.DirectionalLight(0x9ab8e8, 0.55);
+    fillLight.position.set(-25, 30, -20);
     scene.add(fillLight);
 
-    /* Rim light quente (contraluz) */
-    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.5);
-    rimLight.position.set(5, -5, -35);
+    /* Contraluz quente (bounce do chão) */
+    const rimLight = new THREE.DirectionalLight(0xffcf88, 0.35);
+    rimLight.position.set(10, -8, -30);
     scene.add(rimLight);
 
-    /* Hemisphere para o chão */
-    scene.add(new THREE.HemisphereLight(0x8ab0d8, 0x111122, 0.4));
+    /* Hemisphere: céu claro / solo escuro */
+    scene.add(new THREE.HemisphereLight(0xb0c8e8, 0x0e1508, 0.45));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -4831,10 +4842,14 @@
       const maxD = Math.max(size.x, size.y, size.z);
       const fRad = camera.fov * Math.PI / 180;
       const dist = (maxD / 2) / Math.tan(fRad / 2) * 1.55;
-      camera.position.set(dist * 0.55, dist * 0.38, dist * 0.88);
+      /* ângulo arquitetônico: 3/4 frontal-alto */
+      camera.position.set(ctr.x + dist * 0.68, ctr.y + dist * 0.52, ctr.z + dist * 0.76);
       camera.lookAt(ctr);
-      const hs = maxD * 1.2;
-      Object.assign(sun.shadow.camera, { left:-hs, right:hs, bottom:-hs, top:hs, far: dist*4 });
+      controls.target.copy(ctr);   /* OrbitControls: órbita em torno do centro */
+      controls.update();
+      /* frustum da sombra calibrado */
+      const hs = maxD * 1.4;
+      Object.assign(sun.shadow.camera, { left:-hs, right:hs, bottom:-hs, top:hs, near:1, far: dist*5 });
       sun.shadow.camera.updateProjectionMatrix();
       return { dist, maxD, ctr };
     }
@@ -4884,13 +4899,16 @@
 
     /* ── Propriedades PBR por categoria (nome do mesh: "base_glass", etc.) ── */
     const CAT_PBR = {
-      glass:    { roughness: 0.04, metalness: 0.10, transparent: true,  opacity: 0.35 },
-      metal:    { roughness: 0.25, metalness: 0.85, transparent: false, opacity: 1.0  },
-      wood:     { roughness: 0.82, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      concrete: { roughness: 0.95, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      glass:    { roughness: 0.04, metalness: 0.10, transparent: true,  opacity: 0.55 },  /* mais visível */
+      metal:    { roughness: 0.30, metalness: 0.80, transparent: false, opacity: 1.0  },
+      wood:     { roughness: 0.85, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      concrete: { roughness: 0.92, metalness: 0.0,  transparent: false, opacity: 1.0  },
       brick:    { roughness: 0.88, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      tile:     { roughness: 0.30, metalness: 0.02, transparent: false, opacity: 1.0  },
-      default:  { roughness: 0.72, metalness: 0.02, transparent: false, opacity: 1.0  },
+      tile:     { roughness: 0.35, metalness: 0.02, transparent: false, opacity: 1.0  },
+      road:     { roughness: 0.98, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      sidewalk: { roughness: 0.92, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      grass:    { roughness: 0.95, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      default:  { roughness: 0.80, metalness: 0.0,  transparent: false, opacity: 1.0  },  /* paredes — matte */
     };
 
     /* ── Cache de materiais por categoria ─────────────────────────
@@ -4910,18 +4928,28 @@
         opacity         : p.opacity,
         depthWrite      : !p.transparent,
         side            : THREE.DoubleSide,
-        envMapIntensity : 1.4,
+        envMapIntensity : 0.75,
       });
       return matCache[cat];
     }
 
-    /* Calcula a bounding box global do modelo para detectar pilares abaixo da base */
-    const globalBox = new THREE.Box3().setFromObject(ifcModel);
-    const modelMinY = globalBox.min.y;
-    const modelMaxY = globalBox.max.y;
-    const modelHeight = modelMaxY - modelMinY;
-    /* Threshold: meshes cujo topo fique abaixo de 15% da altura total são pilares/estacas */
-    const pillarThreshold = modelMinY + modelHeight * 0.15;
+    /* Oculta pilares/estacas abaixo da base (bounding box < 15% da altura) */
+    const globalBox       = new THREE.Box3().setFromObject(ifcModel);
+    const modelMinY       = globalBox.min.y;
+    const pillarThreshold = modelMinY + (globalBox.max.y - modelMinY) * 0.15;
+
+    /* Material físico para vidro — reflexo/refração real */
+    const glassPhy = new THREE.MeshPhysicalMaterial({
+      vertexColors    : true,
+      roughness       : 0.04,
+      metalness       : 0.05,
+      transparent     : true,
+      opacity         : 0.45,
+      reflectivity    : 0.95,
+      envMapIntensity : 2.0,
+      side            : THREE.DoubleSide,
+      depthWrite      : false,
+    });
 
     ifcModel.traverse(c => {
       if (!c.isMesh) return;
@@ -4938,8 +4966,7 @@
       /* Lê categoria do nome do mesh: "base_glass" → "glass" */
       const meshName = c.name || (c.parent && c.parent.name) || '';
       const cat      = meshName.split('_')[1] || 'default';
-      c.material     = getMat(CAT_PBR[cat] ? cat : 'default');
-      c.material.envMapIntensity = 0;
+      c.material     = (cat === 'glass') ? glassPhy : getMat(CAT_PBR[cat] ? cat : 'default');
     });
 
     /* ── Corrige eixo: IFC=Z-up → Three.js=Y-up ──────────────── */
@@ -5021,80 +5048,48 @@
       return animateValue(from, to, duration, function(prog) { setParts(prog); }, easeFn);
     }
 
-    /* ── Chão compartilhado ────────────────────────────────── */
+    /* ── Chão em duas camadas + névoa de profundidade ─────── */
     const maxXZ = Math.max(...[ifcModel, baseM, meioM, telhadoM].map(function(m) {
       var s = getSize(getBox(m)); return Math.max(s.x, s.z);
     }));
+
+    /* Chão simples */
     const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(maxXZ * 1.8, 64),
-      new THREE.MeshStandardMaterial({ color: 0x060810, roughness: 0.96, transparent: true, opacity: 0.28 })
+      new THREE.CircleGeometry(maxXZ * 2.0, 48),
+      new THREE.MeshStandardMaterial({ color: 0x0a0c12, roughness: 0.96, metalness: 0 })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
 
     /* ── Estado global ──────────────────────────────────────── */
-    /*  'A'        — exibindo groupA (residencial_definitivo.ifc)
-        'EXPLODED' — exibindo groupB explodido
-        'BUSY'     — transição em curso (cliques ignorados)    */
-    let state    = 'A';
-    let rotY     = 0.35;
-    let rotX     = 0;          /* inclinação vertical (mouse direito) */
-    let visible  = false;
-    let rafId    = null;
-    const baseFOV   = camera.fov;
-    let   targetFOV = baseFOV;
-
-    /* ── Arrasto com botão direito ────────────────────────── */
-    let isDragging  = false;
-    let dragLastX   = 0;
-    let dragLastY   = 0;
+    let state   = 'A';
+    let visible = false;
+    let rafId   = null;
 
     scene.add(groupA);
 
-    /* ── Scroll zoom (FOV) ────────────────────────────────── */
-    canvas.addEventListener('wheel', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      targetFOV = Math.max(10, Math.min(75, targetFOV + e.deltaY * 0.06));
-    }, { passive: false });
+    /* ── OrbitControls — câmera orbita ao redor do modelo ─── */
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping   = true;
+    controls.dampingFactor   = 0.07;
+    controls.autoRotate      = true;
+    controls.autoRotateSpeed = 0.55;     /* rotação lenta e elegante */
+    controls.enablePan       = false;
+    controls.enableZoom      = false;  /* scroll agora controla explosão de partículas */
+    controls.minDistance     = 3;
+    controls.maxDistance     = 600;
+    controls.minPolarAngle   = 0.18;     /* não vai abaixo do solo */
+    controls.maxPolarAngle   = 1.38;
+    canvas.style.cursor      = 'grab';
 
-    canvas.addEventListener('dblclick', function() { targetFOV = baseFOV; });
+    /* Pausa auto-rotate durante interação */
+    controls.addEventListener('start', () => { controls.autoRotate = false; canvas.style.cursor = 'grabbing'; });
+    controls.addEventListener('end',   () => { if (state === 'A') controls.autoRotate = true; canvas.style.cursor = 'grab'; });
 
-    /* ── Controle de ângulo com botão direito do mouse ────────── */
-    /* impede menu de contexto nativo no canvas */
-    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
-    canvas.addEventListener('mousedown', function(e) {
-      if (e.button !== 2) return;
-      isDragging = true;
-      dragLastX  = e.clientX;
-      dragLastY  = e.clientY;
-      canvas.style.cursor = 'grabbing';
-      e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', function(e) {
-      if (!isDragging) return;
-      const dx = e.clientX - dragLastX;
-      const dy = e.clientY - dragLastY;
-      dragLastX = e.clientX;
-      dragLastY = e.clientY;
-
-      /* horizontal → Y; vertical → X (limitado a ±55°) */
-      rotY += dx * 0.008;
-      rotX  = Math.max(-Math.PI * 0.30, Math.min(Math.PI * 0.30, rotX + dy * 0.008));
-    });
-
-    function stopDrag() {
-      if (!isDragging) return;
-      isDragging = false;
-      canvas.style.cursor = 'crosshair';
-      /* rotX vai lerpar suavemente de volta a 0 no tick loop */
-    }
-    window.addEventListener('mouseup',    function(e) { if (e.button === 2) stopDrag(); });
-    window.addEventListener('mouseleave', stopDrag);
-    canvas.addEventListener('mouseleave', stopDrag);
+    /* Botão direito do mouse também orbita (em vez de fazer pan) */
+    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
 
     /* ── helper: atualiza texto do hint com fade ───────────────── */
     function setHint(txt) {
@@ -5108,90 +5103,164 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       CLIQUE — sequência completa de animação
+       SCROLL → EXPLOSÃO DE PARTÍCULAS
     ══════════════════════════════════════════════════════════ */
-    canvas.addEventListener('click', async function() {
-      if (state === 'BUSY') return;
-      const previousState = state;
-      state = 'BUSY';
 
-      /* ─────────────────────────────────────────────
-         A  →  EXPLODED
-         1. Fade-out groupA  (450 ms)
-         2. Troca para groupB montado, fade-in (450 ms)
-         3. Aguarda 1 s
-         4. Animação de explosão (900 ms, easeOut)
-      ───────────────────────────────────────────── */
-      if (previousState === 'A') {
-        if (hint) hint.style.opacity = '0';
+    /* ── Sistema de partículas ─────────────────────────────── */
+    const MAX_PTS  = 8000;
+    let ptsObj  = null;   /* THREE.Points — as partículas        */
+    let ptsMat  = null;   /* PointsMaterial                      */
+    let ptsHome = null;   /* Float32Array  — posições originais  */
+    let ptsExpl = null;   /* Float32Array  — posições explodidas */
 
-        /* 1 — apaga groupA com fade */
-        await fadeOverlay(0, 1, 450);
-
-        /* troca grupos; garante posições montadas */
-        scene.remove(groupA);
-        setParts(0);
-        scene.add(groupB);
-        fitCamera(groupB);
-        targetFOV = camera.fov;
-
-        /* 2 — revela groupB montado */
-        await fadeOverlay(1, 0, 450);
-
-        /* hint intermediário */
-        if (hint) {
-          hint.style.transition = 'none';
-          hint.textContent  = '✶ Aguarde...';
-          hint.style.opacity = '0.35';
+    function buildParticleSystem(model) {
+      /* 1 — coleta vértices de todos os meshes com suas cores */
+      const allV = [], allC = [];
+      model.updateMatrixWorld(true);
+      model.traverse(function(c) {
+        if (!c.isMesh) return;
+        c.updateWorldMatrix(true, false);
+        const geo  = c.geometry;
+        const pos  = geo.attributes.position;
+        const col  = geo.attributes.color;
+        const mat4 = c.matrixWorld;
+        const tmp  = new THREE.Vector3();
+        for (let i = 0; i < pos.count; i++) {
+          tmp.fromBufferAttribute(pos, i).applyMatrix4(mat4);
+          allV.push(tmp.x, tmp.y, tmp.z);
+          if (col) allC.push(col.getX(i), col.getY(i), col.getZ(i));
+          else     allC.push(0.70, 0.62, 0.50);
         }
+      });
 
-        /* 3 — pausa 1 segundo: usuário vê a casa montada */
-        await sleep(1000);
+      /* 2 — subsample para MAX_PTS partículas */
+      const n    = allV.length / 3;
+      const step = Math.max(1, Math.ceil(n / MAX_PTS));
+      const box  = getBox(model);
+      const ctr  = getCtr(box);
+      const sz   = getSize(box);
+      const spread = Math.max(sz.x, sz.y, sz.z);
 
-        /* 4 — explosão: peças sobem e ficam suspensas */
-        targetFOV = Math.min(70, camera.fov + 12);   /* abre câmera levemente */
-        await animateParts(0, 1, 900, easeOut);
+      const hArr = [], eArr = [], cArr = [];
+      for (let i = 0; i < n; i += step) {
+        const x = allV[i*3], y = allV[i*3+1], z = allV[i*3+2];
+        hArr.push(x, y, z);
 
-        state = 'EXPLODED';
-        setHint('🖱 Clique para voltar ao modelo completo');
+        /* posição explodida: diverge do centro + ruído */
+        const dx  = x - ctr.x, dy = y - ctr.y, dz = z - ctr.z;
+        const len = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
+        const s   = spread * (0.9 + Math.random() * 1.4);
+        eArr.push(
+          x + (dx/len)*s + (Math.random()-0.5)*spread*0.3,
+          y + (dy/len)*s + spread * 0.15 * Math.random(),
+          z + (dz/len)*s + (Math.random()-0.5)*spread*0.3
+        );
 
-      /* ─────────────────────────────────────────────
-         EXPLODED  →  A
-         1. Colapso: peças voltam ao montado (700 ms)
-         2. Pausa 200 ms (deleite visual)
-         3. Fade-out groupB (450 ms)
-         4. Troca para groupA, fade-in (450 ms)
-      ───────────────────────────────────────────── */
-      } else {
-        if (hint) hint.style.opacity = '0';
-
-        /* 1 — recolhe as peças de volta ao montado */
-        targetFOV = baseFOV;
-        await animateParts(1, 0, 700, easeInOut);
-
-        /* 2 — breve pausa com as 3 peças montadas */
-        await sleep(200);
-
-        /* 3 — apaga groupB */
-        await fadeOverlay(0, 1, 450);
-
-        /* troca grupos */
-        scene.remove(groupB);
-        scene.add(groupA);
-        fitCamera(groupA);
-        targetFOV = camera.fov;
-
-        /* 4 — revela groupA */
-        await fadeOverlay(1, 0, 450);
-
-        state = 'A';
-        setHint('🖱 Clique para ver em 3 partes');
+        /* cor das partículas: ligeiramente mais brilhante */
+        const ci = i * 3;
+        cArr.push(
+          Math.min(1, (allC[ci]   != null ? allC[ci]   : 0.68) * 1.4),
+          Math.min(1, (allC[ci+1] != null ? allC[ci+1] : 0.60) * 1.4),
+          Math.min(1, (allC[ci+2] != null ? allC[ci+2] : 0.50) * 1.4)
+        );
       }
-    });
+
+      /* 3 — cria geometria e material de pontos */
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(hArr.slice(), 3));
+      geo.setAttribute('color',    new THREE.Float32BufferAttribute(cArr, 3));
+
+      ptsMat = new THREE.PointsMaterial({
+        size            : Math.max(sz.x, sz.z) * 0.007,
+        vertexColors    : true,
+        sizeAttenuation : true,
+        transparent     : true,
+        opacity         : 0,
+        depthWrite      : false,
+      });
+
+      ptsObj  = new THREE.Points(geo, ptsMat);
+      ptsHome = new Float32Array(hArr);
+      ptsExpl = new Float32Array(eArr);
+    }
+
+    /* ── Modelo → Partículas (scroll ↓) ───────────────────── */
+    async function triggerParticleExplode() {
+      if (state !== 'A' || !ptsObj) return;
+      state = 'BUSY';
+      controls.autoRotate = false;
+      if (hint) hint.style.opacity = '0';
+
+      /* Reseta partículas para posições home com opacidade máxima */
+      const posAttr = ptsObj.geometry.attributes.position;
+      posAttr.array.set(ptsHome);
+      posAttr.needsUpdate = true;
+      ptsMat.opacity = 1;
+
+      /* Escurece → troca modelo por partículas → revela */
+      await fadeOverlay(0, 0.88, 320);
+      scene.remove(groupA);
+      scene.add(ptsObj);
+      await fadeOverlay(0.88, 0, 320);
+
+      /* Partículas explodem para fora */
+      await animateValue(0, 1, 1100, function(prog) {
+        const arr = posAttr.array;
+        for (let i = 0, n = ptsHome.length; i < n; i += 3) {
+          arr[i]   = lerp(ptsHome[i],   ptsExpl[i],   prog);
+          arr[i+1] = lerp(ptsHome[i+1], ptsExpl[i+1], prog);
+          arr[i+2] = lerp(ptsHome[i+2], ptsExpl[i+2], prog);
+        }
+        posAttr.needsUpdate = true;
+      }, easeOut);
+
+      state = 'PARTICLES';
+      setHint('🖱 Arraste para girar  ·  scroll ↑ para voltar');
+    }
+
+    /* ── Partículas → Modelo (scroll ↑) ───────────────────── */
+    async function triggerParticleAssemble() {
+      if (state !== 'PARTICLES' || !ptsObj) return;
+      state = 'BUSY';
+      if (hint) hint.style.opacity = '0';
+
+      const posAttr = ptsObj.geometry.attributes.position;
+
+      /* Partículas convergem de volta e somem */
+      await animateValue(0, 1, 950, function(prog) {
+        ptsMat.opacity = lerp(1, 0.05, prog);
+        const arr = posAttr.array;
+        for (let i = 0, n = ptsHome.length; i < n; i += 3) {
+          arr[i]   = lerp(ptsExpl[i],   ptsHome[i],   prog);
+          arr[i+1] = lerp(ptsExpl[i+1], ptsHome[i+1], prog);
+          arr[i+2] = lerp(ptsExpl[i+2], ptsHome[i+2], prog);
+        }
+        posAttr.needsUpdate = true;
+      }, easeInOut);
+
+      /* Escurece → troca partículas por modelo → revela */
+      await fadeOverlay(0, 0.88, 280);
+      scene.remove(ptsObj);
+      scene.add(groupA);
+      fitCamera(groupA);
+      await fadeOverlay(0.88, 0, 380);
+
+      state = 'A';
+      controls.autoRotate = true;
+      setHint('⏬ Scroll ↓ para explodir  ·  arraste para girar');
+    }
+
+    /* ── Roda do mouse: explode / regrupa ─────────────────── */
+    canvas.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (state === 'BUSY') return;
+      if (e.deltaY > 0 && state === 'A')         triggerParticleExplode();
+      if (e.deltaY < 0 && state === 'PARTICLES') triggerParticleAssemble();
+    }, { passive: false });
 
     /* ── Resize ──────────────────────────────────────────── */
     function resize() {
-      var w = canvas.offsetWidth, h = canvas.offsetHeight;
+      const w = canvas.offsetWidth, h = canvas.offsetHeight;
       if (!w || !h) return;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
@@ -5202,42 +5271,31 @@
     function tick() {
       rafId = requestAnimationFrame(tick);
       if (!visible) return;
-
-      /* zoom suave */
-      camera.fov += (targetFOV - camera.fov) * 0.09;
-      camera.updateProjectionMatrix();
-
-      /* rotação horizontal automática (sempre avança) */
-      rotY += 0.004;
-
-      /* inclinação vertical: lerpa de volta a 0 quando soltar o botão direito */
-      if (!isDragging) rotX += (0 - rotX) * 0.06;
-
-      /* aplica rotações nos dois grupos */
-      groupA.rotation.set(rotX, rotY, 0);
-      groupB.rotation.set(rotX, rotY, 0);
-
+      controls.update();
       renderer.render(scene, camera);
     }
 
-    /* ── Inicializa e renderiza imediatamente ───────────────────── */
+    /* ── Inicia ──────────────────────────────────────────────── */
     fitCamera(groupA);
     resize();
+    buildParticleSystem(groupA);   /* prepara sistema de partículas */
+    if (hint) {
+      hint.style.opacity = '0.55';
+      hint.textContent   = '⏬ Scroll ↓ para explodir  ·  arraste para girar';
+    }
     visible = true;
     tick();
 
-    /* ── Pausa quando fora da tela (performance) ─────────────────── */
-    const visObs = new IntersectionObserver(function(entries) {
-      visible = entries[0].isIntersecting;
-    }, { threshold: 0.05 });
-    visObs.observe(canvas);
+    /* ── Pausa quando fora da tela ou aba oculta ─────────────── */
+    new IntersectionObserver(function(entries) {
+      visible = entries[0].isIntersecting && !document.hidden;
+    }, { threshold: 0.05 }).observe(canvas);
 
-    window.addEventListener('resize', resize);
-
-    /* ── Pausa render loop quando aba não está ativa ── */
     document.addEventListener('visibilitychange', function() {
       visible = !document.hidden;
     });
+
+    window.addEventListener('resize', resize);
 
   }
   </script>
