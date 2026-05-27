@@ -18,7 +18,8 @@
       "Bash(python3 _patch_3d.py)",
       "Bash(Remove-Item \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\\\\_patch_3d.py\" -Force)",
       "PowerShell(Start-Process python -ArgumentList '-m', 'http.server', '8080' -WorkingDirectory \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\")",
-      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing)"
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing)",
+      "PowerShell(cd \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\"; Start-Process python -ArgumentList \"-m\", \"http.server\", \"8080\" -WindowStyle Hidden; Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing\\).StatusCode)"
     ]
   }
 }

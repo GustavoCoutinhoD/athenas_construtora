@@ -356,7 +356,7 @@
       z-index: 2;
       display: flex;
       gap: 28px;
-      padding: 140px 40px 80px 6vw;
+      padding: 80px 40px 80px 6vw;
       align-items: flex-start;
       justify-content: center;
       flex-direction: column;
@@ -688,21 +688,16 @@
     .servicos-header .section-sub { margin: 0 auto; }
 
     .servicos-layout {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 0;
-      align-items: stretch;
-      width: 100vw;
-      margin-left: calc(-1 * (100vw - 100%) / 2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .servicos-cards-col {
-      min-width: 0;
-      padding-left: 5vw;
-      padding-right: 120px;
-      padding-top: 20px;
-      padding-bottom: 20px;
+      width: 100%;
+      padding: 20px 0;
       display: flex;
+      justify-content: center;
       align-items: center;
     }
 
@@ -748,8 +743,9 @@
 
     .servicos-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(3, minmax(0, 340px));
+      gap: 28px;
+      justify-content: center;
     }
 
     @media (max-width: 1024px) {
@@ -764,11 +760,14 @@
 
     .servico-card {
       background: var(--white);
-      padding: 32px 22px;
+      padding: 40px 28px;
       position: relative;
       overflow: hidden;
       transition: var(--trans);
       border-radius: 10px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
     }
 
     .servico-card::before {
@@ -1038,7 +1037,7 @@
     .proj-tabs {
       display: inline-flex;
       gap: 0;
-      margin-top: 20px;
+      margin-top: 60px;
       margin-bottom: 36px;
       border-bottom: 1px solid rgba(255,255,255,.1);
     }
@@ -1205,7 +1204,7 @@
       flex-direction: column;
       justify-content: center;
     }
-    .projetos-header { text-align: center; margin-bottom: 16px; }
+    .projetos-header { text-align: center; margin-bottom: 16px; margin-top: -80px; }
     .projetos-header .section-title { color: var(--white); }
     .projetos-header .divider { margin: 24px auto 40px; }
 
@@ -1426,7 +1425,7 @@
     .ts-left {
       display: flex;
       flex-direction: column;
-      margin-top: -90px;
+      margin-top: -130px;
     }
 
     .ts-eyebrow {
@@ -1497,8 +1496,9 @@
 
     .ts-metrics {
       display: flex;
-      gap: 12px;
-      margin: 0;
+      gap: 14px;
+      margin-top: 62px;
+      margin-left: 10%;
       width: 75%;
       opacity: 0;
       transform: translateY(12px);
@@ -1508,11 +1508,14 @@
     .ts-metric {
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      padding: 18px 22px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 10px;
-      background: rgba(255,255,255,.03);
+      gap: 8px;
+      padding: 20px 24px;
+      border: none;
+      border-left: 2px solid rgba(255,255,255,.15);
+      border-radius: 0;
+      background: none;
+      backdrop-filter: none;
+      box-shadow: none;
       transition: border-color 0.5s ease;
       flex: 1;
       min-width: 0;
@@ -1520,7 +1523,7 @@
 
     .ts-metric-val {
       font-family: 'Anton', sans-serif;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 400;
       color: #fff;
       line-height: 1;
@@ -1533,10 +1536,10 @@
     }
 
     .ts-metric-label {
-      font-size: 9px;
-      letter-spacing: 2px;
+      font-size: 10px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: rgba(255,255,255,.3);
+      color: rgba(255,255,255,.45);
     }
 
     .ts-cta {
@@ -1600,19 +1603,19 @@
       width: 75%;
       margin: 0 auto;
       opacity: 0;
-      overflow: hidden;         /* impede ts-img-glow (inset:-30px) de vazar fora */
+      overflow: visible;
       border-radius: 18px;
       animation: tsReveal 1s cubic-bezier(0.4,0,0.2,1) 0.5s forwards;
     }
 
     .ts-img {
       width: 100%;
-      min-height: 130px;
-      object-fit: cover;
+      height: 560px;
+      object-fit: contain;
       border-radius: 18px;
       display: block;
       transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease;
-      box-shadow: 0 50px 120px rgba(0,0,0,.8), 0 12px 40px rgba(0,0,0,.5);
+      box-shadow: none;
     }
 
     .ts-img-wrap.ts-transitioning .ts-img {
@@ -1623,10 +1626,10 @@
 
     .ts-img-glow {
       position: absolute;
-      inset: -30px;
-      border-radius: 24px;
-      opacity: 0.22;
-      filter: blur(50px);
+      inset: -80px;
+      border-radius: 50%;
+      opacity: 0.28;
+      filter: blur(80px);
       transition: background 0.8s ease, opacity 0.8s ease;
       z-index: -1;
       pointer-events: none;
@@ -1637,7 +1640,7 @@
       position: absolute;
       inset: 0;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.07);
+      border: none;
       pointer-events: none;
     }
 
@@ -1676,7 +1679,7 @@
     .ts-right {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 28px;
       padding-left: 12px;
       padding-right: 0;
       border-left: 1px solid rgba(255,255,255,.06);
@@ -1732,7 +1735,7 @@
     .ts-nav-text { display: flex; flex-direction: column; gap: 3px; }
 
     .ts-nav-name {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -1937,12 +1940,16 @@
       background: var(--white);
       padding: 80px 0;
       margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
     }
 
     .bim-hero .container {
       width: 100%;
       max-width: none;
       margin: 0;
+      position: relative;
+      z-index: 1;
       padding-left: 7%;
       padding-right: 0;
     }
@@ -1981,80 +1988,112 @@
       display: flex;
       gap: 16px;
       margin-bottom: 48px;
+      width: 115%;
     }
 
     .bim-stat {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      background: var(--light);
-      border: 1.5px solid rgba(200,155,60,.25);
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid rgba(200,155,60,.3);
       border-radius: 14px;
-      padding: 20px 24px;
-      flex: 1;
+      padding: 24px 20px;
+      flex: 1 1 0;
+      min-width: 0;
+      width: 0;
       transition: var(--trans);
+      box-shadow: 0 4px 20px rgba(200,155,60,.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bim-stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #C89B3C, transparent);
+      opacity: 0.7;
     }
 
     .bim-stat:hover {
-      border-color: var(--gold);
-      box-shadow: 0 8px 24px rgba(200,155,60,.12);
+      border-color: rgba(200,155,60,.6);
+      box-shadow: 0 8px 32px rgba(200,155,60,.18);
       transform: translateY(-3px);
     }
 
     .bim-stat-num {
-      font-family: 'Anton', sans-serif;
-      font-size: 48px;
-      font-weight: 400;
-      color: var(--gold);
+      font-family: 'Inter', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #E8C87A 0%, #C89B3C 50%, #A67C24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       line-height: 1;
-      letter-spacing: 0.02em;
+      letter-spacing: -0.01em;
     }
 
     .bim-stat-label {
-      font-size: 12px;
-      color: var(--gray);
-      letter-spacing: 0.04em;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--navy);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.7;
     }
 
     /* features */
     .bim-features {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 0;
     }
 
     .bim-feature {
       display: flex;
-      gap: 18px;
-      padding: 20px 22px;
-      border-radius: 12px;
-      border: 1px solid rgba(0,0,0,.07);
-      background: var(--light);
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+      padding: 22px 0;
+      border-radius: 0;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,.07);
+      background: transparent;
       transition: var(--trans);
-      align-items: flex-start;
+      align-items: center;
+    }
+
+    .bim-feature:first-child {
+      border-top: 1px solid rgba(0,0,0,.07);
     }
 
     .bim-feature:hover {
-      border-color: rgba(200,155,60,.4);
-      background: rgba(200,155,60,.06);
-      transform: translateX(6px);
+      padding-left: 8px;
+    }
+
+    .bim-feature:hover .bim-feature-icon {
+      border-color: rgba(200,155,60,.5);
+      background: rgba(200,155,60,.12);
     }
 
     .bim-feature-icon {
       flex-shrink: 0;
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, rgba(200,155,60,.15), rgba(200,155,60,.05));
-      border-radius: 10px;
-      border: 1px solid rgba(200,155,60,.2);
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border-radius: 50%;
+      border: 1px solid rgba(200,155,60,.25);
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: var(--trans);
     }
 
     .bim-feature-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       stroke: var(--gold);
       fill: none;
       stroke-width: 1.5;
@@ -2063,16 +2102,18 @@
     }
 
     .bim-feature-title {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
       color: var(--navy);
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
     }
 
     .bim-feature-desc {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--gray);
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     /* right: mockup */
@@ -3109,17 +3150,6 @@
         </p>
       </div>
 
-      <!-- CTA buttons -->
-      <div class="ah-actions">
-        <a href="#projetos" class="ah-btn-outline">
-          PROJETOS
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-        <a href="#contato" class="ah-btn-primary">
-          Contato
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-      </div>
 
     </div>
   </section>
@@ -3173,7 +3203,7 @@
       <!-- CENTER: imagem -->
       <div class="ts-center">
         <div class="ts-img-wrap" id="ts-img-wrap">
-          <img class="ts-img" id="ts-main-img" src="imagens/portfolio_1.png" alt="Projeto residencial ATHENAS - arquitetura e maquete 3D em São Paulo" loading="lazy">
+          <img class="ts-img" id="ts-main-img" src="imagens/residencial_00_sem_fundo.png" alt="Projeto residencial ATHENAS - arquitetura e maquete 3D em São Paulo" loading="lazy">
           <!-- Canvas 3D Maquete -->
           <canvas id="ts-3d-canvas"></canvas>
           <!-- Hint de interação -->
@@ -3182,10 +3212,6 @@
           </div>
           <div class="ts-img-glow" id="ts-img-glow"></div>
           <div class="ts-img-frame"></div>
-          <div class="ts-img-badge">
-            <div class="ts-img-badge-dot" id="ts-badge-dot"></div>
-            <span class="ts-img-badge-text" id="ts-badge-text">Residencial</span>
-          </div>
         </div>
 
         <!-- Métricas abaixo da imagem -->
@@ -3255,7 +3281,7 @@
   <!-- ══ SERVIÇOS ═════════════════════════════════════════════ -->
   <section id="servicos">
     <div class="container">
-      <div class="servicos-header reveal-left">
+      <div class="servicos-header reveal-left" style="margin-top:-60px;">
         <span class="tag">O que Fazemos</span>
         <h2 class="section-title" style="font-family:'Inter',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:-0.03em;"><span style="color:var(--gold);">NOSSOS</span> <span>SERVIÇOS</span></h2>
         <div class="divider" style="margin:24px auto 0;"></div>
@@ -3338,14 +3364,22 @@
       </div>
         </div><!-- fim servicos-cards-col -->
 
-        <!-- Coluna direita: imagem do empreendimento -->
-        <div class="servicos-img-col">
-          <img src="imagens/empreendimento_sem_fundo.png" alt="Empreendimento arquitetônico ATHENAS - projeto residencial e comercial em São Paulo" class="servicos-empreendimento" id="servicos-empreendimento" loading="lazy">
-        </div>
       </div><!-- fim servicos-layout -->
 
     </div>
   </section>
+
+  <!-- ── Divisor ondulado: serviços → projetos ── -->
+  <div style="background:#F5F4F0; line-height:0; margin:0; padding:0; overflow:hidden;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 130" preserveAspectRatio="none" style="display:block;width:100%;height:130px;">
+      <!-- Camada traseira: claro acinzentado -->
+      <path d="M0,18 C300,90 620,5 920,52 C1160,85 1330,30 1440,22 L1440,130 L0,130 Z" fill="#E8E5DE"/>
+      <!-- Camada intermediária: gold (acento premium) -->
+      <path d="M0,45 C260,8 540,85 860,46 C1110,12 1310,72 1440,52 L1440,130 L0,130 Z" fill="#C89B3C"/>
+      <!-- Camada frontal: fundo da seção seguinte (navy escuro) -->
+      <path d="M0,78 C320,38 640,105 960,72 C1180,48 1340,88 1440,80 L1440,130 L0,130 Z" fill="#0F2A4A"/>
+    </svg>
+  </div>
 
   <!-- ══ PROJETOS ═════════════════════════════════════════════ -->
   <section id="projetos">
@@ -3355,7 +3389,7 @@
         <h2 class="section-title" style="color:#fff;font-family:'Cormorant Garamond',serif;font-size:clamp(32px,3.5vw,52px);font-weight:600;">NOSSO <span>PORTFÓLIO</span></h2>
 
         <!-- Abas filtro -->
-        <div class="proj-tabs reveal">
+        <div class="proj-tabs reveal" style="margin-top:140px;">
           <button class="proj-tab active" data-tab="pos">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             PÓS FINALIZADOS
@@ -3422,16 +3456,36 @@
     <img id="lightbox-img" src="" alt="">
   </div>
 
+  <!-- ── Divisor discreto: portfólio → BIM ── -->
+  <div style="background:#0F2A4A; line-height:0; margin:0; padding:0; overflow:hidden;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 60" preserveAspectRatio="none" style="display:block;width:100%;height:60px;">
+      <defs>
+        <linearGradient id="subtleGold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#C89B3C" stop-opacity="0"/>
+          <stop offset="40%"  stop-color="#C89B3C" stop-opacity="0.7"/>
+          <stop offset="60%"  stop-color="#E8C87A" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#C89B3C" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect width="1440" height="60" fill="#F5F4F0"/>
+      <path d="M0,0 L1440,0 L1440,30 C960,60 480,0 0,40 Z" fill="#0F2A4A"/>
+      <path d="M0,40 C480,0 960,60 1440,30" fill="none" stroke="url(#subtleGold)" stroke-width="1"/>
+    </svg>
+  </div>
+
   <!-- ══ BIM ══════════════════════════════════════════════════ -->
   <section id="bim" style="padding:0;">
 
     <!-- Hero BIM -->
     <div class="bim-hero">
-      <div class="container">
+
+
+      <div class="container" style="position:relative;z-index:2;">
         <div class="bim-hero-inner">
 
           <!-- Texto -->
-          <div class="reveal">
+          <div class="reveal" style="position:relative;">
+
             <span class="tag">Tecnologia</span>
             <h2 class="bim-hero-title">TECNOLOGIA <span>BIM</span></h2>
             <p class="bim-hero-sub">
@@ -3454,7 +3508,7 @@
               </div>
             </div>
 
-            <div class="bim-features">
+            <div class="bim-features" style="position:relative;">
               <div class="bim-feature">
                 <div class="bim-feature-icon">
                   <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -3483,11 +3537,17 @@
                 </div>
               </div>
             </div>
+
+
           </div>
 
           <!-- 3D BIM -->
           <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
-            <canvas id="bim-3d-canvas" style="height:600px;display:block;border-radius:16px;cursor:crosshair;box-shadow:0 20px 60px rgba(0,0,0,.1);margin-left:100px;margin-right:100px;margin-top:125px;width:calc(100% - 200px);background:#000;"></canvas>
+            <div style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;">
+              <canvas id="bim-3d-canvas" style="height:600px;display:block;width:100%;cursor:crosshair;background:#000;outline:none;border:none;vertical-align:bottom;"></canvas>
+              <!-- Vinheta para eliminar halo branco nas bordas -->
+              <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);pointer-events:none;z-index:5;"></div>
+            </div>
             <div id="bim-3d-hint" style="margin-top:14px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">🖱 Clique para ver em 3 partes &nbsp;·&nbsp; Btn. direito para girar</div>
           </div>
 
@@ -3497,6 +3557,22 @@
 
 
   </section>
+
+  <!-- ── Divisor linha full: BIM → Depoimentos ── -->
+  <div style="background:#F5F4F0; margin:0; padding:0 0 0 0; overflow:hidden; line-height:0;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 2" preserveAspectRatio="none" style="display:block;width:100%;height:2px;">
+      <defs>
+        <linearGradient id="lineGold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#C89B3C" stop-opacity="0"/>
+          <stop offset="20%"  stop-color="#C89B3C" stop-opacity="0.8"/>
+          <stop offset="50%"  stop-color="#E8C87A" stop-opacity="1"/>
+          <stop offset="80%"  stop-color="#C89B3C" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#C89B3C" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect width="1440" height="2" fill="url(#lineGold)"/>
+    </svg>
+  </div>
 
   <!-- ══ DEPOIMENTOS ══════════════════════════════════════════ -->
   <section id="depoimentos">
@@ -4110,11 +4186,11 @@
       var PROJECTS = [
         {
           eyebrow: 'Portfólio · 01',
-          line1: 'RESIDÊNCIA',
+          line1: 'RESIDENCIAL',
           line2: 'ALTO PADRÃO',
           subtitle: 'Projeto Arquitetônico Residencial',
           desc: 'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.',
-          img: 'imagens/portfolio_1.png',
+          img: 'imagens/residencial_00_sem_fundo.png',
           m1: '320m²', m2: '3 dias', m3: '4X MAIS',
           badge: 'Residencial',
           glow: '#1D6FA8'
@@ -4125,7 +4201,7 @@
           line2: 'COMERCIAL',
           subtitle: 'Arquitetura Corporativa',
           desc: 'Desenvolvimento completo de empreendimento comercial, integrando todas as disciplinas em modelo federado com análise de interferências e quantitativos precisos.',
-          img: 'imagens/portfolio_2.png',
+          img: 'imagens/galpao_00_sem_fundo.png',
           m1: '580m²', m2: '5 dias', m3: '4X MAIS',
           badge: 'Comercial',
           glow: '#D2B496'
@@ -4136,10 +4212,10 @@
           line2: 'ELÉTRICA',
           subtitle: 'Instalações Elétricas Prediais',
           desc: 'Projeto elétrico completo com dimensionamento de circuitos, quadros de distribuição, SPDA e automação predial, compatibilizado em plataforma BIM.',
-          img: 'imagens/portfolio_3.png',
+          img: 'imagens/eletrica_001_sem_fundo.png',
           m1: '850m²', m2: '4 dias', m3: '4X MAIS',
           badge: 'Elétrica',
-          glow: '#FDE047'
+          glow: '#C89B3C'
         },
         {
           eyebrow: 'Portfólio · 04',
@@ -4147,7 +4223,7 @@
           line2: 'HIDRÁULICA',
           subtitle: 'Sistemas Hidrossanitários',
           desc: 'Projeto hidrossanitário completo com dimensionamento de redes de água fria, quente, esgoto e pluvial, compatibilizado em modelo BIM federado.',
-          img: 'imagens/portfolio_4.png',
+          img: 'imagens/hidraulica_00_sem_fundo.png',
           m1: '420m²', m2: '6 dias', m3: '4X MAIS',
           badge: 'Hidráulica',
           glow: '#60A5FA'
@@ -4158,7 +4234,7 @@
           line2: '3D',
           subtitle: 'Visualização Fotorrealista',
           desc: 'Modelagem e renderização 3D fotorrealista de empreendimentos residenciais e comerciais, com ambientação completa e materiais de alta qualidade.',
-          img: 'imagens/portfolio_1.png',
+          img: 'imagens/maquete_00_sem_fundo.png',
           m1: '360m²', m2: '7 dias', m3: '4X MAIS',
           badge: 'Maquete 3D',
           glow: '#C89B3C'
@@ -4235,15 +4311,40 @@
         });
       }
 
+      function animateMetric(el, targetStr, dur, fromZero) {
+        if (!el) return;
+        var match = targetStr.match(/^([\d.]+)(.*)/);
+        if (!match) { el.textContent = targetStr; return; }
+        var targetNum = parseInt(match[1].replace(/\./g, ''), 10);
+        var suffix    = match[2];
+        if (isNaN(targetNum)) { el.textContent = targetStr; return; }
+        var startNum;
+        if (fromZero) {
+          startNum = 0;
+        } else {
+          var spread = Math.max(2, Math.round(targetNum * 0.4));
+          startNum = Math.max(1, targetNum - Math.floor(Math.random() * spread + Math.ceil(spread * 0.4)));
+        }
+        var t0 = null;
+        requestAnimationFrame(function tick(ts) {
+          if (!t0) t0 = ts;
+          var p  = Math.min((ts - t0) / dur, 1);
+          var ep = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(startNum + (targetNum - startNum) * ep) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = targetStr;
+        });
+      }
+
       function applyContent(p) {
         if (el.eyebrow) el.eyebrow.textContent = p.eyebrow;
         if (el.line1)   el.line1.textContent   = p.line1;
         if (el.line2)   el.line2.textContent   = p.line2;
         if (el.subtitle)el.subtitle.textContent= p.subtitle;
         if (el.desc)    el.desc.textContent    = p.desc;
-        if (el.m1)      el.m1.textContent      = p.m1;
-        if (el.m2)      el.m2.textContent      = p.m2;
-        if (el.m3)      el.m3.textContent      = p.m3;
+        animateMetric(el.m1, p.m1, 1800, false);
+        animateMetric(el.m2, p.m2, 1600, true);
+        animateMetric(el.m3, p.m3, 1600, true);
         if (badgeText)  badgeText.textContent  = p.badge;
         setGlow(p.glow);
       }
@@ -4667,32 +4768,28 @@
     canvas.parentElement.appendChild(overlay);
 
     /* ── Renderer ────────────────────────────────────── */
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled   = true;
-    renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+    renderer.setClearColor(0x000000, 1);
+    renderer.shadowMap.enabled   = false;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
-    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
+    renderer.toneMapping         = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 0.85;
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
 
-    /* ── Ambiente IBL (RoomEnvironment) — iluminação realista ── */
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    pmrem.compileEquirectangularShader();
-    const envTexture = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
-    scene.environment = envTexture;   /* IBL em todos os materiais PBR */
-    pmrem.dispose();
+    /* ── Ambiente IBL desativado — usamos apenas luzes diretas ── */
+    scene.environment = null;
 
     /* ── Iluminação (IBL via RoomEnvironment + luzes diretas) ────── */
     /* AmbientLight leve — IBL faz a maior parte do trabalho */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.08));
 
     /* Sol principal — sombra nítida */
-    const sun = new THREE.DirectionalLight(0xfff4e0, 3.8);
+    const sun = new THREE.DirectionalLight(0xfff4e0, 1.6);
     sun.position.set(25, 50, 30);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -4700,17 +4797,17 @@
     scene.add(sun);
 
     /* Luz de preenchimento fria (céu) */
-    const fillLight = new THREE.DirectionalLight(0xb8d0ff, 1.4);
+    const fillLight = new THREE.DirectionalLight(0xb8d0ff, 0.7);
     fillLight.position.set(-20, 20, -15);
     scene.add(fillLight);
 
     /* Rim light quente (contraluz) */
-    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.9);
+    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.5);
     rimLight.position.set(5, -5, -35);
     scene.add(rimLight);
 
     /* Hemisphere para o chão */
-    scene.add(new THREE.HemisphereLight(0xd0e8ff, 0x1a1a2e, 0.8));
+    scene.add(new THREE.HemisphereLight(0x8ab0d8, 0x111122, 0.4));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -4818,15 +4915,31 @@
       return matCache[cat];
     }
 
+    /* Calcula a bounding box global do modelo para detectar pilares abaixo da base */
+    const globalBox = new THREE.Box3().setFromObject(ifcModel);
+    const modelMinY = globalBox.min.y;
+    const modelMaxY = globalBox.max.y;
+    const modelHeight = modelMaxY - modelMinY;
+    /* Threshold: meshes cujo topo fique abaixo de 15% da altura total são pilares/estacas */
+    const pillarThreshold = modelMinY + modelHeight * 0.15;
+
     ifcModel.traverse(c => {
       if (!c.isMesh) return;
       c.castShadow = c.receiveShadow = true;
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
 
+      /* Oculta pilares/estacas: meshes cujo bounding box fica quase inteiro abaixo da base */
+      const meshBox = new THREE.Box3().setFromObject(c);
+      if (meshBox.max.y < pillarThreshold) {
+        c.visible = false;
+        return;
+      }
+
       /* Lê categoria do nome do mesh: "base_glass" → "glass" */
       const meshName = c.name || (c.parent && c.parent.name) || '';
       const cat      = meshName.split('_')[1] || 'default';
       c.material     = getMat(CAT_PBR[cat] ? cat : 'default');
+      c.material.envMapIntensity = 0;
     });
 
     /* ── Corrige eixo: IFC=Z-up → Three.js=Y-up ──────────────── */
