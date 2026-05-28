@@ -4981,8 +4981,8 @@
     renderer.setClearColor(0x000000, 1);
     renderer.shadowMap.enabled   = false;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
-    renderer.toneMapping         = THREE.LinearToneMapping;
-    renderer.toneMappingExposure = 0.85;
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
@@ -4992,31 +4992,23 @@
     /* ── Ambiente IBL desativado — usamos apenas luzes diretas ── */
     scene.environment = null;
 
-    /* ── Iluminação (luzes diretas) ──────────────────────────── */
-    /* AmbientLight leve */
-    scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+    /* ── Iluminação — intensidades calibradas para preservar cores ── */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
-    /* Sol principal — sombra nítida */
-    const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(25, 50, 30);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.bias   = -0.0004;
-    sun.shadow.radius = 3;          /* borda suave nas sombras */
+    sun.castShadow = false;
     scene.add(sun);
 
-    /* Luz de preenchimento fria (céu) */
-    const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    const fillLight = new THREE.DirectionalLight(0xddeeff, 0.5);
     fillLight.position.set(-20, 20, -15);
     scene.add(fillLight);
 
-    /* Rim light quente (contraluz) */
-    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.5);
+    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.3);
     rimLight.position.set(5, -5, -35);
     scene.add(rimLight);
 
-    /* Hemisphere para o chão */
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.2));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 0.4));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -5095,7 +5087,7 @@
       return;
     }
 
-    /* Normaliza materiais e geometrias — preserva cores originais do GLB */
+    /* Preserva todos os materiais e cores originais do GLB */
     ifcModel.traverse(c => {
       c.visible = true;
       if (!c.isMesh) return;
@@ -5104,9 +5096,7 @@
       mats.forEach(m => {
         if (!m) return;
         m.envMapIntensity = 0;
-        /* garante que vertex colors só ficam ativos se a geometria realmente tem o atributo */
-        m.vertexColors = !!c.geometry.attributes.color;
-        m.needsUpdate  = true;
+        m.needsUpdate = true;
       });
     });
 
