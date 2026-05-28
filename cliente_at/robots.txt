@@ -1,8 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /3D/
+Disallow: /prompt.txt
+Disallow: /.claude/
+Disallow: /.htaccess
 
 # Sitemaps
 Sitemap: https://athenasconstrutora.com.br/sitemap.xml
-
-# Crawl-delay (opcional)
-Crawl-delay: 1
