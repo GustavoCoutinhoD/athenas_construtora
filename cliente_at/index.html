@@ -5095,31 +5095,20 @@
       return;
     }
 
-    /* Normaliza materiais e geometrias do GLB */
-    ifcModel.updateMatrixWorld(true);
-    const _meshData = [];
+    /* Normaliza materiais e geometrias — preserva cores originais do GLB */
     ifcModel.traverse(c => {
       c.visible = true;
       if (!c.isMesh) return;
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
       const mats = Array.isArray(c.material) ? c.material : [c.material];
-      mats.forEach(m => { if (m) { m.envMapIntensity = 0; m.needsUpdate = true; } });
-      /* coleta centro XZ para detecção de outliers */
-      const mb = new THREE.Box3().setFromObject(c);
-      const mc = new THREE.Vector3(); mb.getCenter(mc);
-      _meshData.push({ mesh: c, cx: mc.x, cy: mc.y, cz: mc.z });
+      mats.forEach(m => {
+        if (!m) return;
+        m.envMapIntensity = 0;
+        /* garante que vertex colors só ficam ativos se a geometria realmente tem o atributo */
+        m.vertexColors = !!c.geometry.attributes.color;
+        m.needsUpdate  = true;
+      });
     });
-
-    /* Oculta malhas isoladas (artifacts flutuantes fora da massa principal) */
-    if (_meshData.length > 3) {
-      const meanX = _meshData.reduce((s, d) => s + d.cx, 0) / _meshData.length;
-      const meanZ = _meshData.reduce((s, d) => s + d.cz, 0) / _meshData.length;
-      const dists = _meshData.map(d => Math.hypot(d.cx - meanX, d.cz - meanZ));
-      const sorted = [...dists].sort((a, b) => a - b);
-      const med    = sorted[Math.floor(sorted.length / 2)];
-      const thr    = Math.max(med * 4 + 2, 8);
-      _meshData.forEach((d, i) => { if (dists[i] > thr) d.mesh.visible = false; });
-    }
 
     /* Centraliza o modelo inteiro no centro do mundo */
     const groupA = new THREE.Group();
