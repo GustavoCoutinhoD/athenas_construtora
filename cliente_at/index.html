@@ -322,7 +322,14 @@
       width: 24px;
       height: 2px;
       background: var(--white);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
     }
+
+    /* Animação X quando menu está aberto */
+    .hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     /* ─── ANIMATED HERO ─────────────────────────────────────── */
     #hero {
@@ -2967,6 +2974,144 @@
         height: 32px;
       }
     }
+
+    /* ════════════════════════════════════════════════════════════
+       MOBILE — otimização completa para celular
+    ════════════════════════════════════════════════════════════ */
+
+    @media (max-width: 768px) {
+
+      /* ── HEADER ── */
+      #header .container { padding: 0 20px; }
+      .logo-name { font-size: 18px; letter-spacing: 2px; }
+      .logo-tagline { display: none; }
+      .logo img { height: 38px !important; }
+
+      /* ── HERO ── */
+      #hero-video {
+        width: 100%;
+        opacity: 0.3;
+        object-position: center top;
+      }
+      #beams-overlay {
+        background: linear-gradient(to bottom,
+          rgba(10,10,10,0.80) 0%,
+          rgba(10,10,10,0.70) 60%,
+          rgba(10,10,10,0.90) 100%
+        );
+      }
+      .ah-inner {
+        width: 100%;
+        max-width: 100%;
+        padding: 110px 24px 60px;
+        min-height: 70vh;
+      }
+      .ah-title { font-size: clamp(30px, 9vw, 44px) !important; }
+
+      /* ── SEÇÃO 3 (portfólio / tesla-style) ── */
+      .proj-tabs { margin-top: 32px !important; }
+
+      .ts-metrics {
+        margin-left: 0;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0;
+      }
+      .ts-metric {
+        flex: 1 1 calc(33% - 2px);
+        min-width: 90px;
+        padding: 14px 12px;
+      }
+      .ts-metric-val { font-size: 22px !important; }
+      .ts-metric-label { font-size: 10px; }
+
+      /* ── SERVIÇOS ── */
+      .servicos-header { margin-top: 0 !important; }
+
+      /* ── BIM 3D CANVAS ── */
+      .bim-visual { position: static !important; }
+      .bim-canvas-wrap {
+        margin-left:  0    !important;
+        margin-right: 0    !important;
+        margin-top:   20px !important;
+        width:        100% !important;
+        border-radius: 10px !important;
+      }
+      #bim-3d-canvas { height: 280px !important; }
+
+      /* ── BIM STATS ── */
+      .bim-stats-row {
+        width: 100% !important;
+        flex-wrap: wrap;
+      }
+      .bim-stat {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+        width: auto !important;
+      }
+      .bim-stat-num { font-size: 28px; }
+
+      /* ── BIM STEPS ── */
+      .bim-steps { grid-template-columns: 1fr !important; gap: 24px !important; }
+
+      /* ── GALERIA ── */
+      .galeria-grid { gap: 10px; }
+
+      /* ── DEPOIMENTOS ── */
+      .depo-col { width: 92vw; }
+
+      /* ── CONTATO ── */
+      .contato-form { padding: 24px 18px; }
+
+      /* ── FOOTER ── */
+      .footer-links { flex-direction: column; gap: 24px; }
+
+    }
+
+    @media (max-width: 480px) {
+
+      /* ── HEADER ── */
+      .logo-icon { width: 36px; height: 36px; }
+      .logo-name { font-size: 16px; }
+
+      /* ── HERO ── */
+      .ah-inner { padding: 100px 18px 50px; }
+      .ah-badge { font-size: 12px; }
+
+      /* ── SEÇÕES GERAIS ── */
+      section { padding: 56px 0 !important; }
+      .container { width: 92%; }
+      .section-title { font-size: clamp(22px, 7vw, 34px); }
+
+      /* ── MÉTRICAS ── */
+      .ts-metric {
+        flex: 1 1 100%;
+        border-left: none;
+        border-top: 1px solid rgba(255,255,255,.08);
+        padding: 12px 0;
+      }
+
+      /* ── BIM STATS ── */
+      .bim-stat { flex: 1 1 100%; }
+      .bim-stat-num { font-size: 24px; }
+
+      /* ── BIM CANVAS ── */
+      #bim-3d-canvas { height: 240px !important; }
+
+      /* ── PROJ TABS ── */
+      .proj-tab { font-size: 11px; padding: 8px 12px; }
+
+      /* ── CARDS SERVIÇO ── */
+      .servico-card { padding: 28px 20px; min-height: 220px; }
+
+      /* ── FORMULÁRIO ── */
+      .contato-form { padding: 20px 14px; }
+      .form-submit { font-size: 13px; padding: 14px; }
+
+      /* ── LIGHTBOX BOTÃO VOLTAR ── */
+      #lb button { font-size: 11px; padding: 8px 14px; top: 12px; left: 12px; }
+
+    }
   </style>
 
   <!-- ── STRUCTURED DATA / JSON-LD ──────────────────────────── -->
@@ -3575,7 +3720,7 @@
 
           <!-- 3D BIM -->
           <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
-            <div style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;">
+            <div class="bim-canvas-wrap" style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;">
               <canvas id="bim-3d-canvas" style="height:600px;display:block;width:100%;cursor:crosshair;background:#000;outline:none;border:none;vertical-align:bottom;"></canvas>
               <!-- Vinheta para eliminar halo branco nas bordas -->
               <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);pointer-events:none;z-index:5;"></div>
@@ -4046,12 +4191,29 @@
     // ── Mobile nav ─────────────────────────────────────────
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
-    hamburger.addEventListener('click', () => {
-      nav.classList.toggle('open');
-    });
-    nav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => nav.classList.remove('open'));
-    });
+
+    // Overlay para fechar ao clicar fora
+    const navOverlay = document.createElement('div');
+    navOverlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,0.5);backdrop-filter:blur(2px);';
+    document.body.appendChild(navOverlay);
+
+    function openNav() {
+      nav.classList.add('open');
+      navOverlay.style.display = 'block';
+      hamburger.setAttribute('aria-expanded', 'true');
+      hamburger.classList.add('is-open');
+    }
+    function closeNav() {
+      nav.classList.remove('open');
+      navOverlay.style.display = 'none';
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.classList.remove('is-open');
+    }
+
+    hamburger.addEventListener('click', () => nav.classList.contains('open') ? closeNav() : openNav());
+    navOverlay.addEventListener('click', closeNav);
+    nav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
 
     // ── Lightbox ───────────────────────────────────────────
     const lightbox     = document.getElementById('lightbox');
