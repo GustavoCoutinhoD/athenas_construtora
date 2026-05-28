@@ -4976,13 +4976,13 @@
     canvas.parentElement.appendChild(overlay);
 
     /* ── Renderer ────────────────────────────────────── */
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 1);
     renderer.shadowMap.enabled   = false;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
-    renderer.toneMapping         = THREE.LinearToneMapping;
-    renderer.toneMappingExposure = 0.85;
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
@@ -4992,18 +4992,15 @@
     /* ── Ambiente IBL desativado — usamos apenas luzes diretas ── */
     scene.environment = null;
 
-    /* ── Iluminação (luzes diretas) ──────────────────────────── */
-    scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+    /* ── Iluminação calibrada para vertex-color GLB ── */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.08));
 
-    const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+    const sun = new THREE.DirectionalLight(0xfff4e0, 1.6);
     sun.position.set(25, 50, 30);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.bias   = -0.0004;
-    sun.shadow.radius = 3;
+    sun.castShadow = false;
     scene.add(sun);
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    const fillLight = new THREE.DirectionalLight(0xb8d0ff, 0.7);
     fillLight.position.set(-20, 20, -15);
     scene.add(fillLight);
 
@@ -5011,7 +5008,7 @@
     rimLight.position.set(5, -5, -35);
     scene.add(rimLight);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.2));
+    scene.add(new THREE.HemisphereLight(0x8ab0d8, 0x111122, 0.4));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -5040,10 +5037,6 @@
       camera.lookAt(ctr);
       controls.target.copy(ctr);   /* OrbitControls: órbita em torno do centro */
       controls.update();
-      /* frustum da sombra calibrado */
-      const hs = maxD * 1.4;
-      Object.assign(sun.shadow.camera, { left:-hs, right:hs, bottom:-hs, top:hs, near:1, far: dist*5 });
-      sun.shadow.camera.updateProjectionMatrix();
       return { dist, maxD, ctr };
     }
 
@@ -5076,12 +5069,42 @@
       hint.textContent   = '⟳ Carregando modelo 3D...';
     }
 
-    /* ── Carrega GLB (residencial_definitivo convertido do IFC) ── */
+    /* ── Materiais PBR por categoria (vertex-color GLB) ──────── */
+    const CAT_PBR = {
+      glass:    { roughness: 0.04, metalness: 0.10, transparent: true,  opacity: 0.55 },
+      metal:    { roughness: 0.30, metalness: 0.80, transparent: false, opacity: 1.0  },
+      wood:     { roughness: 0.85, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      concrete: { roughness: 0.92, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      brick:    { roughness: 0.88, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      tile:     { roughness: 0.35, metalness: 0.02, transparent: false, opacity: 1.0  },
+      grass:    { roughness: 0.95, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      road:     { roughness: 0.90, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      sidewalk: { roughness: 0.90, metalness: 0.0,  transparent: false, opacity: 1.0  },
+      default:  { roughness: 0.80, metalness: 0.0,  transparent: false, opacity: 1.0  },
+    };
+    const matCache = {};
+    function getMat(cat) {
+      if (matCache[cat]) return matCache[cat];
+      const p = CAT_PBR[cat] || CAT_PBR.default;
+      matCache[cat] = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness:    p.roughness,
+        metalness:    p.metalness,
+        transparent:  p.transparent,
+        opacity:      p.opacity,
+        depthWrite:   !p.transparent,
+        side:         THREE.DoubleSide,
+        envMapIntensity: 0,
+      });
+      return matCache[cat];
+    }
+
+    /* ── Carrega GLB com vertex colors (residencial_definitivo.glb) ── */
     const loader = new GLTFLoader();
     let ifcModel;
     try {
       const gltf = await new Promise((res, rej) =>
-        loader.load('3D/residencial.glb', res, undefined, rej)
+        loader.load('3D/residencial_definitivo.glb', res, undefined, rej)
       );
       ifcModel = gltf.scene;
     } catch (err) {
@@ -5090,42 +5113,34 @@
       return;
     }
 
-    /* Normaliza materiais e geometrias do GLB */
+    /* Corrige orientação IFC (Z-up → Y-up) */
+    ifcModel.rotation.x = -Math.PI / 2;
+    ifcModel.rotation.z = Math.PI;
     ifcModel.updateMatrixWorld(true);
-    const _meshData = [];
+
+    /* Oculta pilares/base subterrâneos */
+    const globalBox = new THREE.Box3().setFromObject(ifcModel);
+    const modelMinY = globalBox.min.y;
+    const pillarThreshold = modelMinY + (globalBox.max.y - modelMinY) * 0.15;
+
+    /* Aplica materiais PBR por categoria (nome do mesh: base_concrete → concrete) */
     ifcModel.traverse(c => {
-      c.visible = true;
       if (!c.isMesh) return;
+      const meshBox = new THREE.Box3().setFromObject(c);
+      if (meshBox.max.y < pillarThreshold) { c.visible = false; return; }
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
-      const mats = Array.isArray(c.material) ? c.material : [c.material];
-      mats.forEach(m => { if (m) { m.envMapIntensity = 0; m.needsUpdate = true; } });
-      const mb = new THREE.Box3().setFromObject(c);
-      const mc = new THREE.Vector3(); mb.getCenter(mc);
-      _meshData.push({ mesh: c, cx: mc.x, cy: mc.y, cz: mc.z });
+      const meshName = c.name || (c.parent && c.parent.name) || '';
+      const cat = meshName.split('_')[1] || 'default';
+      c.material = getMat(CAT_PBR[cat] ? cat : 'default');
     });
 
-    /* Oculta malhas isoladas (artifacts flutuantes fora da massa principal) */
-    if (_meshData.length > 3) {
-      const meanX = _meshData.reduce((s, d) => s + d.cx, 0) / _meshData.length;
-      const meanZ = _meshData.reduce((s, d) => s + d.cz, 0) / _meshData.length;
-      const dists = _meshData.map(d => Math.hypot(d.cx - meanX, d.cz - meanZ));
-      const sorted = [...dists].sort((a, b) => a - b);
-      const med    = sorted[Math.floor(sorted.length / 2)];
-      const thr    = Math.max(med * 4 + 2, 8);
-      _meshData.forEach((d, i) => { if (dists[i] > thr) d.mesh.visible = false; });
-    }
-
-    /* Centraliza o modelo inteiro no centro do mundo */
+    /* Centraliza o modelo inteiro */
+    centerXZ(ifcModel);
     const groupA = new THREE.Group();
     groupA.add(ifcModel);
+    const gcA = getCtr(getBox(groupA));
+    groupA.position.y -= gcA.y;
     scene.add(groupA);
-
-    const fullBox = getBox(groupA);
-    const fullCtr = getCtr(fullBox);
-    const fullSz  = getSize(fullBox);
-
-    /* Move o grupo para que o centro do bounding box fique na origem */
-    groupA.position.set(-fullCtr.x, -fullCtr.y, -fullCtr.z);
 
     let visible = false;
     let rafId   = null;
