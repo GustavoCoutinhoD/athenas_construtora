@@ -5087,17 +5087,61 @@
       return;
     }
 
-    /* Preserva todos os materiais e cores originais do GLB */
+    /* ── Paleta arquitetônica por tipo IFC ───────────────────────
+       O GLB gerado pelo Python nomeia cada mesh/material com o tipo
+       IFC (IfcWall, IfcSlab, IfcRoof…). Aqui mapeamos esses nomes
+       para cores realistas de arquitetura residencial.
+    ─────────────────────────────────────────────────────────────── */
+    const IFC_PALETTE = [
+      { keys: ['wall','parede','wallstandardcase'],  color: 0xE8D8C0, rough: 0.85 },
+      { keys: ['slab','laje','floor','piso'],         color: 0xB8B0A4, rough: 0.90 },
+      { keys: ['roof','telhado','roofing'],           color: 0x7A5C4A, rough: 0.80 },
+      { keys: ['window','janela','glazing','vidro'],  color: 0x8BBDD4, rough: 0.05, metal: 0.1, transparent: true, opacity: 0.55 },
+      { keys: ['door','porta'],                       color: 0x6B4E34, rough: 0.75 },
+      { keys: ['column','coluna','pillar','pilar'],   color: 0xD0C8B4, rough: 0.85 },
+      { keys: ['beam','viga'],                        color: 0xC8B89C, rough: 0.80 },
+      { keys: ['stair','escada'],                     color: 0xCCC4B4, rough: 0.82 },
+      { keys: ['rail','corrimao','railing'],           color: 0x787878, rough: 0.40, metal: 0.6 },
+      { keys: ['covering','forro','ceiling','teto'],  color: 0xF0EAE0, rough: 0.90 },
+      { keys: ['furnish','mobil','furniture'],        color: 0xA08060, rough: 0.70 },
+    ];
+
+    const _matCache = new Map();
+
+    function getArchMat(name) {
+      const n = (name || '').toLowerCase().replace(/[_\s\-]/g, '');
+      for (const entry of IFC_PALETTE) {
+        if (entry.keys.some(k => n.includes(k))) {
+          if (_matCache.has(k)) return _matCache.get(k); // reusa material
+          const m = new THREE.MeshStandardMaterial({
+            color:          entry.color,
+            roughness:      entry.rough  ?? 0.82,
+            metalness:      entry.metal  ?? 0.0,
+            transparent:    !!entry.transparent,
+            opacity:        entry.opacity ?? 1.0,
+            envMapIntensity: 0,
+            side:           THREE.DoubleSide,
+          });
+          _matCache.set(entry.keys[0], m);
+          return m;
+        }
+      }
+      /* fallback: cinza quente neutro */
+      if (!_matCache.has('default')) {
+        _matCache.set('default', new THREE.MeshStandardMaterial({
+          color: 0xCEC6B8, roughness: 0.85, metalness: 0, envMapIntensity: 0, side: THREE.DoubleSide,
+        }));
+      }
+      return _matCache.get('default');
+    }
+
     ifcModel.traverse(c => {
       c.visible = true;
       if (!c.isMesh) return;
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
-      const mats = Array.isArray(c.material) ? c.material : [c.material];
-      mats.forEach(m => {
-        if (!m) return;
-        m.envMapIntensity = 0;
-        m.needsUpdate = true;
-      });
+      /* nome do mesh + nome do material original para identificar o tipo IFC */
+      const label = (c.name || '') + ' ' + (Array.isArray(c.material) ? c.material[0]?.name : c.material?.name || '');
+      c.material  = getArchMat(label);
     });
 
     /* Centraliza o modelo inteiro no centro do mundo */
