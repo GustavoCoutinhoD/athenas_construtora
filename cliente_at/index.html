@@ -4981,8 +4981,8 @@
     renderer.setClearColor(0x000000, 1);
     renderer.shadowMap.enabled   = false;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
-    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMapping         = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 0.85;
 
     /* ── Cena / Câmera ──────────────────────────────────── */
     const scene  = new THREE.Scene();
@@ -4992,23 +4992,26 @@
     /* ── Ambiente IBL desativado — usamos apenas luzes diretas ── */
     scene.environment = null;
 
-    /* ── Iluminação — intensidades calibradas para preservar cores ── */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    /* ── Iluminação (luzes diretas) ──────────────────────────── */
+    scene.add(new THREE.AmbientLight(0xffffff, 1.8));
 
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    const sun = new THREE.DirectionalLight(0xffffff, 2.5);
     sun.position.set(25, 50, 30);
-    sun.castShadow = false;
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.bias   = -0.0004;
+    sun.shadow.radius = 3;
     scene.add(sun);
 
-    const fillLight = new THREE.DirectionalLight(0xddeeff, 0.5);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
     fillLight.position.set(-20, 20, -15);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.3);
+    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.5);
     rimLight.position.set(5, -5, -35);
     scene.add(rimLight);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 0.4));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.2));
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -5087,62 +5090,30 @@
       return;
     }
 
-    /* ── Paleta arquitetônica por tipo IFC ───────────────────────
-       O GLB gerado pelo Python nomeia cada mesh/material com o tipo
-       IFC (IfcWall, IfcSlab, IfcRoof…). Aqui mapeamos esses nomes
-       para cores realistas de arquitetura residencial.
-    ─────────────────────────────────────────────────────────────── */
-    const IFC_PALETTE = [
-      { keys: ['wall','parede','wallstandardcase'],  color: 0xE8D8C0, rough: 0.85 },
-      { keys: ['slab','laje','floor','piso'],         color: 0xB8B0A4, rough: 0.90 },
-      { keys: ['roof','telhado','roofing'],           color: 0x7A5C4A, rough: 0.80 },
-      { keys: ['window','janela','glazing','vidro'],  color: 0x8BBDD4, rough: 0.05, metal: 0.1, transparent: true, opacity: 0.55 },
-      { keys: ['door','porta'],                       color: 0x6B4E34, rough: 0.75 },
-      { keys: ['column','coluna','pillar','pilar'],   color: 0xD0C8B4, rough: 0.85 },
-      { keys: ['beam','viga'],                        color: 0xC8B89C, rough: 0.80 },
-      { keys: ['stair','escada'],                     color: 0xCCC4B4, rough: 0.82 },
-      { keys: ['rail','corrimao','railing'],           color: 0x787878, rough: 0.40, metal: 0.6 },
-      { keys: ['covering','forro','ceiling','teto'],  color: 0xF0EAE0, rough: 0.90 },
-      { keys: ['furnish','mobil','furniture'],        color: 0xA08060, rough: 0.70 },
-    ];
-
-    const _matCache = new Map();
-
-    function getArchMat(name) {
-      const n = (name || '').toLowerCase().replace(/[_\s\-]/g, '');
-      for (const entry of IFC_PALETTE) {
-        if (entry.keys.some(k => n.includes(k))) {
-          if (_matCache.has(k)) return _matCache.get(k); // reusa material
-          const m = new THREE.MeshStandardMaterial({
-            color:          entry.color,
-            roughness:      entry.rough  ?? 0.82,
-            metalness:      entry.metal  ?? 0.0,
-            transparent:    !!entry.transparent,
-            opacity:        entry.opacity ?? 1.0,
-            envMapIntensity: 0,
-            side:           THREE.DoubleSide,
-          });
-          _matCache.set(entry.keys[0], m);
-          return m;
-        }
-      }
-      /* fallback: cinza quente neutro */
-      if (!_matCache.has('default')) {
-        _matCache.set('default', new THREE.MeshStandardMaterial({
-          color: 0xCEC6B8, roughness: 0.85, metalness: 0, envMapIntensity: 0, side: THREE.DoubleSide,
-        }));
-      }
-      return _matCache.get('default');
-    }
-
+    /* Normaliza materiais e geometrias do GLB */
+    ifcModel.updateMatrixWorld(true);
+    const _meshData = [];
     ifcModel.traverse(c => {
       c.visible = true;
       if (!c.isMesh) return;
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
-      /* nome do mesh + nome do material original para identificar o tipo IFC */
-      const label = (c.name || '') + ' ' + (Array.isArray(c.material) ? c.material[0]?.name : c.material?.name || '');
-      c.material  = getArchMat(label);
+      const mats = Array.isArray(c.material) ? c.material : [c.material];
+      mats.forEach(m => { if (m) { m.envMapIntensity = 0; m.needsUpdate = true; } });
+      const mb = new THREE.Box3().setFromObject(c);
+      const mc = new THREE.Vector3(); mb.getCenter(mc);
+      _meshData.push({ mesh: c, cx: mc.x, cy: mc.y, cz: mc.z });
     });
+
+    /* Oculta malhas isoladas (artifacts flutuantes fora da massa principal) */
+    if (_meshData.length > 3) {
+      const meanX = _meshData.reduce((s, d) => s + d.cx, 0) / _meshData.length;
+      const meanZ = _meshData.reduce((s, d) => s + d.cz, 0) / _meshData.length;
+      const dists = _meshData.map(d => Math.hypot(d.cx - meanX, d.cz - meanZ));
+      const sorted = [...dists].sort((a, b) => a - b);
+      const med    = sorted[Math.floor(sorted.length / 2)];
+      const thr    = Math.max(med * 4 + 2, 8);
+      _meshData.forEach((d, i) => { if (dists[i] > thr) d.mesh.visible = false; });
+    }
 
     /* Centraliza o modelo inteiro no centro do mundo */
     const groupA = new THREE.Group();
