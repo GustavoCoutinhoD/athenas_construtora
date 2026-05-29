@@ -15,7 +15,7 @@
     font-src    'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:;
     img-src     'self' data: blob:;
     media-src   'self';
-    connect-src 'self';
+    connect-src 'self' blob:;
     frame-src   'none';
     object-src  'none';
     base-uri    'self';
@@ -1527,7 +1527,7 @@
     .ts-metrics {
       display: flex;
       gap: 14px;
-      margin-top: 28px;
+      margin-top: 32px;
       margin-left: 10%;
       width: 75%;
       opacity: 0;
@@ -1618,6 +1618,64 @@
     .ts-cta svg { width: 15px; height: 15px; position: relative; z-index: 1; flex-shrink: 0; }
     .ts-cta span { position: relative; z-index: 1; }
 
+    /* ── Navegação mobile da 3ª seção ── */
+    .ts-mobile-nav {
+      display: none;
+    }
+    @media (max-width: 1024px) {
+      .ts-mobile-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 14px 8px 6px;
+        gap: 12px;
+      }
+      .ts-mob-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.25);
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.2s, border-color 0.2s;
+      }
+      .ts-mob-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.5); }
+      .ts-mob-btn svg { width: 18px; height: 18px; }
+      .ts-mob-label {
+        flex: 1;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: rgba(255,255,255,0.7);
+        text-transform: uppercase;
+      }
+    }
+
+    /* Desktop: botão fica no grid column 1, row 2 */
+    .ts-cta-bottom {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+      margin-top: -180px;
+    }
+    /* Desktop: métricas na coluna 2, row 2 (abaixo da imagem) */
+    .ts-metrics {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: start;
+    }
+    /* Garante que o nav direito fique sempre na coluna 3, row 1 */
+    .ts-right {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
     /* ── CENTER ── */
     .ts-center {
       position: relative;
@@ -1625,7 +1683,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 10px;
     }
 
     .ts-img-wrap {
@@ -1640,7 +1698,7 @@
 
     .ts-img {
       width: 100%;
-      height: 560px;
+      height: 440px;
       object-fit: contain;
       border-radius: 18px;
       display: block;
@@ -1980,7 +2038,7 @@
       margin: 0;
       position: relative;
       z-index: 1;
-      padding-left: 7%;
+      padding-left: 13%;
       padding-right: 0;
     }
 
@@ -2819,8 +2877,9 @@
       width: 100%;
       aspect-ratio: 1 / 1;
       cursor: crosshair;
-      /* gradiente de céu: alpha:true no renderer deixa o CSS aparecer */
-      background: linear-gradient(180deg, #0e1e38 0%, #060d1c 55%, #030810 100%);
+      background: transparent;
+      position: relative;
+      z-index: 2;
     }
 
     #bim-3d-hint {
@@ -3113,6 +3172,174 @@
       #lb button { font-size: 11px; padding: 8px 14px; top: 12px; left: 12px; }
 
     }
+
+    /* ════════════════════════════════════════════════
+       TABLET  (max-width: 1024px)
+    ════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+
+      /* ── HERO ── */
+      .ah-inner { width: 70%; padding: 100px 32px 60px 5vw; }
+      .ah-title { font-size: clamp(26px, 4vw, 48px) !important; white-space: normal !important; }
+
+      /* ── SOBRE / TESLA SHOWCASE ── */
+      .ts-left { margin-top: -80px; }
+      .ts-img { height: 420px; }
+
+      /* ── BIM 3D ── */
+      .bim-canvas-wrap { margin-left: 40px !important; margin-right: 20px !important; margin-top: 60px !important; width: calc(100% - 60px) !important; }
+      #bim-3d-canvas { height: 380px !important; }
+      .bim-hero { padding: 60px 0; }
+      .bim-stats-row { flex-wrap: wrap; gap: 12px; width: 100%; }
+      .bim-stat { flex: 1 1 calc(33% - 10px); min-width: 100px; }
+
+      /* ── DEPOIMENTOS ── */
+      .depo-cols { gap: 16px; }
+      .depo-col { width: 280px; }
+
+      /* ── FOOTER ── */
+      .footer-top { gap: 32px; }
+      .footer-col { min-width: 0; }
+
+      /* ── SERVIÇOS ── */
+      .servico-card { padding: 32px 24px; }
+
+      /* ── GALERIA / PORTFOLIO ── */
+      .galeria-carousel { margin: 0; padding: 0 16px; }
+
+    }
+
+    /* ════════════════════════════════════════════════
+       MOBILE MÉDIO  (max-width: 768px)
+    ════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* ── GERAL ── */
+      section { padding: 64px 0 !important; }
+      .container { width: 92%; }
+      h2, .section-title { font-size: clamp(22px, 7vw, 36px) !important; white-space: normal !important; }
+
+      /* ── HERO ── */
+      .ah-inner { width: 100%; max-width: 100%; padding: 100px 20px 56px; overflow: hidden; }
+      .ah-title { font-size: clamp(22px, 8vw, 38px) !important; white-space: normal !important; word-break: break-word; overflow-wrap: break-word; }
+      .ah-actions { flex-wrap: wrap; gap: 12px; }
+
+      /* ── SOBRE / TESLA ── */
+      .ts-inner { padding: 80px 20px 60px; gap: 20px; }
+      .ts-left { margin-top: 0; max-width: 100%; order: -1; }
+      .ts-center { order: 0; }
+      .ts-cta-bottom { grid-column: unset; grid-row: unset; margin-top: 20px; align-self: center; order: 1; display: flex; margin-left: auto; margin-right: auto; }
+      .ts-metrics { grid-column: unset; grid-row: unset; order: 2; }
+      .ts-title { font-size: clamp(28px, 9vw, 46px) !important; }
+      .ts-img { height: 320px; }
+      .ts-img-wrap { width: 92%; }
+      .ts-metrics { margin-left: 0 !important; width: 100% !important; flex-wrap: nowrap; gap: 0; justify-content: space-between; }
+      .ts-metric { flex: 1 1 0; min-width: 0; padding: 10px 6px; }
+      .ts-metric:first-child { text-align: left; }
+      .ts-metric:nth-child(2) { text-align: center; }
+      .ts-metric:last-child  { text-align: right; }
+      .ts-metric-val { font-size: 19px !important; white-space: nowrap; }
+      .ts-metric-label { font-size: 9px; letter-spacing: 1.5px; white-space: nowrap; }
+      .ts-cta { font-size: 13px; padding: 12px 20px; }
+
+      /* ── BIM ── */
+      .bim-hero-inner { grid-template-columns: 1fr; gap: 32px; padding: 0 16px 0 0; overflow: hidden; margin-left: -14px; }
+      .bim-features { padding-left: 0; margin-left: 0; }
+      .bim-feature { padding-left: 0; gap: 14px; }
+      .bim-hero { padding: 56px 0; overflow: hidden; }
+      .bim-hero-inner > *:first-child { padding-left: 0 !important; }
+      .bim-hero * { max-width: 100%; box-sizing: border-box; }
+      .bim-visual { position: static !important; order: 1; }
+      #bim-mouse-hint { display: none !important; }
+      .bim-canvas-wrap { margin: 0 auto !important; width: 95% !important; margin-top: 0 !important; }
+      #bim-3d-canvas { height: 300px !important; }
+      .bim-stats-row { flex-wrap: nowrap; gap: 6px; width: 100% !important; margin-left: 0; }
+      .bim-stat { flex: 1 1 0; min-width: 0; padding: 14px 10px; }
+      .bim-stat-num { font-size: clamp(18px, 6vw, 28px); }
+      .bim-stat-label { font-size: 8px; letter-spacing: 0.8px; white-space: normal; word-break: break-word; }
+      .bim-stat-num { font-size: clamp(24px, 7vw, 40px); }
+      .bim-steps { grid-template-columns: 1fr 1fr !important; gap: 28px; }
+
+      /* ── SERVIÇOS ── */
+      .servicos-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+      .servico-card { padding: 24px 16px; min-height: auto; }
+
+      /* ── PORTFOLIO ── */
+      .proj-tabs { flex-wrap: wrap; gap: 8px; margin-top: 24px !important; }
+      .proj-tab { font-size: 12px; padding: 8px 14px; }
+      .galeria-item { flex: 0 0 calc(100% - 14px) !important; }
+      .galeria-carousel { overflow: hidden; }
+
+      /* ── DEPOIMENTOS ── */
+      .depo-cols { gap: 12px; }
+      .depo-col { width: 88vw; }
+      .depo-card { padding: 20px 16px; }
+
+      /* ── CONTATO ── */
+      .contato-grid { grid-template-columns: 1fr; gap: 32px; }
+      .contato-form { padding: 24px 16px; }
+      .form-row { grid-template-columns: 1fr; gap: 12px; }
+      .contato-info { padding: 0 20px; }
+
+      /* ── FOOTER ── */
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; padding: 40px 0 24px; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 12px; font-size: 12px; }
+      .footer-col h4 { font-size: 13px; }
+      .footer-brand { grid-column: 1 / -1; }
+
+    }
+
+    /* ════════════════════════════════════════════════
+       MOBILE PEQUENO  (max-width: 480px)
+    ════════════════════════════════════════════════ */
+    @media (max-width: 480px) {
+
+      /* ── GERAL ── */
+      section { padding: 48px 0 !important; }
+      .container { width: 94%; }
+
+      /* ── HERO ── */
+      .ah-inner { padding: 90px 16px 48px; min-height: 65vh; overflow: hidden; }
+      .ah-title { font-size: clamp(20px, 7.5vw, 34px) !important; line-height: 1.15 !important; white-space: normal !important; word-break: break-word; }
+      .ah-sub { font-size: 13px !important; }
+
+      /* ── SOBRE / TESLA ── */
+      .ts-inner { padding: 60px 16px 48px; }
+      .ts-img { height: 260px; }
+      .ts-img-wrap { width: 100%; }
+      .ts-metric { flex: 1 1 calc(50% - 2px); }
+      .ts-right { display: none; }
+
+      /* ── BIM ── */
+      #bim-3d-canvas { height: 260px !important; }
+      .bim-stat { flex: 1 1 100%; }
+      .bim-stat-num { font-size: clamp(22px, 8vw, 36px); }
+      .bim-steps { grid-template-columns: 1fr !important; gap: 20px; }
+      .bim-hero-inner { padding: 0 16px; }
+
+      /* ── SERVIÇOS ── */
+      .servicos-grid { grid-template-columns: 1fr; gap: 12px; }
+      .servico-card { padding: 20px 14px; }
+
+      /* ── PORTFOLIO ── */
+      .proj-tabs { gap: 6px; }
+      .proj-tab { font-size: 11px; padding: 7px 10px; }
+      .galeria-nav { gap: 8px; }
+      .galeria-btn { width: 32px; height: 32px; }
+
+      /* ── DEPOIMENTOS ── */
+      .depo-col { width: 92vw; }
+      .depo-card { padding: 16px 14px; font-size: 13px; }
+
+      /* ── FOOTER ── */
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 20px 16px; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-col { text-align: left; }
+      .footer-links { align-items: flex-start; }
+      .footer-social { justify-content: flex-start; }
+      .footer-col h4 { text-align: left; }
+
+    }
   </style>
 
   <!-- ── STRUCTURED DATA / JSON-LD ──────────────────────────── -->
@@ -3371,36 +3598,50 @@
         <p class="ts-desc" id="ts-desc">
           Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.
         </p>
-        <a href="#contato" class="ts-cta">
-          <span>ORÇAMENTO</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
       </div>
 
       <!-- CENTER: imagem -->
       <div class="ts-center">
         <div class="ts-img-wrap" id="ts-img-wrap">
-          <img class="ts-img" id="ts-main-img" src="imagens/residencial_00_sem_fundo.png" alt="Projeto residencial ATHENAS - arquitetura e maquete 3D em São Paulo" loading="lazy">
+          <img class="ts-img" id="ts-main-img" src="imagens/residencial_03.png?v=2" alt="Projeto residencial ATHENAS - arquitetura e maquete 3D em São Paulo" loading="lazy">
           <!-- Canvas 3D Maquete -->
           <canvas id="ts-3d-canvas"></canvas>
           <div class="ts-img-glow" id="ts-img-glow"></div>
           <div class="ts-img-frame"></div>
         </div>
 
-        <!-- Métricas abaixo da imagem -->
-        <div class="ts-metrics">
-          <div class="ts-metric">
-            <span class="ts-metric-val" id="ts-m1">320m²</span>
-            <span class="ts-metric-label">Área</span>
-          </div>
-          <div class="ts-metric">
-            <span class="ts-metric-val" id="ts-m2">3 dias</span>
-            <span class="ts-metric-label">Prazo</span>
-          </div>
-          <div class="ts-metric">
-            <span class="ts-metric-val" id="ts-m3">4X MAIS</span>
-            <span class="ts-metric-label">Precisão</span>
-          </div>
+        <!-- Navegação mobile entre projetos -->
+        <div class="ts-mobile-nav" id="ts-mobile-nav">
+          <button class="ts-mob-btn" id="ts-mob-prev" aria-label="Anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="ts-mob-label" id="ts-mob-label">RESIDENCIAL</span>
+          <button class="ts-mob-btn" id="ts-mob-next" aria-label="Próximo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- CTA abaixo da imagem (mobile) / coluna esquerda (desktop) -->
+      <a href="#contato" class="ts-cta ts-cta-bottom">
+        <span>ORÇAMENTO</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- Métricas — após botão no mobile, abaixo da imagem no desktop -->
+      <div class="ts-metrics">
+        <div class="ts-metric">
+          <span class="ts-metric-val" id="ts-m1">320m²</span>
+          <span class="ts-metric-label">Área</span>
+        </div>
+        <div class="ts-metric">
+          <span class="ts-metric-val" id="ts-m2">3 dias</span>
+          <span class="ts-metric-label">Prazo</span>
+        </div>
+        <div class="ts-metric">
+          <span class="ts-metric-val" id="ts-m3">4X MAIS</span>
+          <span class="ts-metric-label">Precisão</span>
         </div>
       </div>
 
@@ -3721,12 +3962,11 @@
 
           <!-- 3D BIM -->
           <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
-            <div class="bim-canvas-wrap" style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;">
-              <canvas id="bim-3d-canvas" style="height:600px;display:block;width:100%;cursor:crosshair;background:#000;outline:none;border:none;vertical-align:bottom;"></canvas>
-              <!-- Vinheta para eliminar halo branco nas bordas -->
-              <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);pointer-events:none;z-index:5;"></div>
+            <div class="bim-canvas-wrap" style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);position:relative;background:transparent;">
+              <canvas id="bim-3d-canvas" style="height:600px;display:block;width:100%;cursor:crosshair;background:transparent;outline:none;border:none;vertical-align:bottom;"></canvas>
             </div>
-            <div id="bim-3d-hint" style="margin-top:14px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">⏬ Role o scroll para explodir</div>
+            <p id="bim-mouse-hint" style="margin-top:12px;margin-left:60px;font-size:11px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;color:rgba(100,80,50,0.7);text-align:center;pointer-events:none;">🖱 Utilize os botões do mouse na imagem 3D</p>
+            <div id="bim-3d-hint" style="margin-top:6px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">⏬ Role o scroll para explodir</div>
           </div>
 
         </div>
@@ -4113,33 +4353,6 @@
       setTimeout(type, 600);
     })();
 
-    // ══ TESLA SHOWCASE (Sobre) ════════════════════════════════
-    (function() {
-      var PROJECTS = [
-        { eyebrow:'Portfólio · 01', line1:'RESIDÊNCIA',      line2:'ALTO PADRÃO',     subtitle:'Projeto Arquitetônico Residencial',   desc:'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.', img:'imagens/portfolio_1.png', m1:'320m²',   m2:'3 dias',  m3:'4X MAIS',  badge:'Residencial', glow:'#60A5FA' },
-        { eyebrow:'Portfólio · 02', line1:'PROJETO',         line2:'COMERCIAL',        subtitle:'Arquitetura Corporativa',             desc:'Desenvolvimento completo de empreendimento comercial, integrando todas as disciplinas em modelo federado com análise de interferências e quantitativos precisos.', img:'imagens/portfolio_2.png', m1:'580m²',   m2:'5 dias', m3:'4X MAIS',  badge:'Comercial',   glow:'#C89B3C' },
-        { eyebrow:'Portfólio · 03', line1:'COMPATIBILIZAÇÃO',line2:'BIM',              subtitle:'Modelo Federado Multidisciplinar',    desc:'Federação de modelos com detecção e resolução de interferências via Navisworks. Relatório completo de conflitos com priorização e acompanhamento técnico.', img:'imagens/portfolio_3.png', m1:'1.200m²', m2:'4 dias',  m3:'4X MAIS',  badge:'BIM',          glow:'#06B6D4' },
-        { eyebrow:'Portfólio · 04', line1:'REFORMA &',       line2:'INTERIORES',       subtitle:'Requalificação de Ambientes',         desc:'Projeto completo de reforma com levantamento arquitetônico, projeto executivo, especificações de materiais e acompanhamento técnico de obra.', img:'imagens/portfolio_4.png', m1:'180m²',   m2:'7 dias',  m3:'4X MAIS',  badge:'Reforma',      glow:'#A78BFA' }
-      ];
-      var current=0, autoTimer=null, transitioning=false, AUTO_DELAY=8000;
-      var section=document.getElementById('sobre'), mainImg=document.getElementById('ts-main-img'), imgWrap=document.getElementById('ts-img-wrap'), imgGlow=document.getElementById('ts-img-glow'), badgeDot=document.getElementById('ts-badge-dot'), badgeText=document.getElementById('ts-badge-text'), progressBar=document.getElementById('ts-progress-bar'), counterWrap=document.getElementById('ts-counter');
-      var navItems=document.querySelectorAll('#sobre .ts-nav-item');
-      var el={eyebrow:document.getElementById('ts-eyebrow'),line1:document.getElementById('ts-line1'),line2:document.getElementById('ts-line2'),subtitle:document.getElementById('ts-subtitle'),desc:document.getElementById('ts-desc'),m1:document.getElementById('ts-m1'),m2:document.getElementById('ts-m2'),m3:document.getElementById('ts-m3'),divider:document.getElementById('ts-divider-line')};
-      if(counterWrap){PROJECTS.forEach(function(_,i){var d=document.createElement('div');d.className='ts-counter-dot'+(i===0?' active':'');d.addEventListener('click',function(){goTo(i);});counterWrap.appendChild(d);});}
-      function setGlow(color){if(!section)return;section.style.setProperty('--ts-glow',color);var o1=section.querySelector('.ts-glow-orb-1'),o2=section.querySelector('.ts-glow-orb-2');if(o1)o1.style.background='radial-gradient(circle,'+color+' 0%,transparent 70%)';if(o2)o2.style.background='radial-gradient(circle,'+color+' 0%,transparent 70%)';if(imgGlow)imgGlow.style.background='radial-gradient(ellipse,'+color+' 0%,transparent 70%)';if(badgeDot){badgeDot.style.background=color;badgeDot.style.boxShadow='0 0 8px '+color;}if(progressBar)progressBar.style.background=color;if(counterWrap){var dots=counterWrap.querySelectorAll('.ts-counter-dot');dots.forEach(function(d,i){if(i===current){d.style.background=color;d.style.boxShadow='0 0 8px '+color;}else{d.style.background='';d.style.boxShadow='';}});}}
-      function applyContent(p){if(el.eyebrow)el.eyebrow.textContent=p.eyebrow;if(el.line1)el.line1.textContent=p.line1;if(el.line2)el.line2.textContent=p.line2;if(el.subtitle)el.subtitle.textContent=p.subtitle;if(el.desc)el.desc.textContent=p.desc;if(el.m1)el.m1.textContent=p.m1;if(el.m2)el.m2.textContent=p.m2;if(el.m3)el.m3.textContent=p.m3;if(badgeText)badgeText.textContent=p.badge;setGlow(p.glow);}
-      function textFade(out){[el.eyebrow,el.line1,el.line2,el.subtitle,el.desc,el.divider,el.m1,el.m2,el.m3].forEach(function(e){if(!e)return;e.style.transition='opacity 0.3s ease,transform 0.3s ease';e.style.opacity=out?'0':'1';e.style.transform=out?'translateY(-10px)':'translateY(0)';});}
-      function startProgress(){if(!progressBar)return;progressBar.style.transition='none';progressBar.style.width='0%';progressBar.offsetHeight;progressBar.style.transition='width '+AUTO_DELAY+'ms linear';progressBar.style.width='100%';}
-      function goTo(index){if(transitioning||index===current)return;transitioning=true;current=index;navItems.forEach(function(ni,i){ni.classList.toggle('active',i===index);});if(counterWrap){var dots=counterWrap.querySelectorAll('.ts-counter-dot');dots.forEach(function(d,i){d.classList.toggle('active',i===index);});}textFade(true);imgWrap.classList.add('ts-transitioning');setTimeout(function(){applyContent(PROJECTS[index]);mainImg.src=PROJECTS[index].img;setTimeout(function(){imgWrap.classList.remove('ts-transitioning');textFade(false);transitioning=false;},80);},320);resetAutoplay();}
-      function resetAutoplay(){clearTimeout(autoTimer);startProgress();autoTimer=setTimeout(function(){goTo((current+1)%PROJECTS.length);},AUTO_DELAY);}
-      navItems.forEach(function(ni){ni.addEventListener('click',function(){var idx=parseInt(ni.getAttribute('data-index'));if(idx!==current)goTo(idx);});});
-      applyContent(PROJECTS[0]);
-      resetAutoplay();
-      if(section){section.addEventListener('mouseenter',function(){clearTimeout(autoTimer);if(progressBar)progressBar.style.transition='none';});section.addEventListener('mouseleave',function(){resetAutoplay();});}
-      document.addEventListener('keydown',function(e){if(!section)return;var r=section.getBoundingClientRect();if(r.bottom<0||r.top>window.innerHeight)return;if(e.key==='ArrowRight'||e.key==='ArrowDown')goTo((current+1)%PROJECTS.length);if(e.key==='ArrowLeft'||e.key==='ArrowUp')goTo((current-1+PROJECTS.length)%PROJECTS.length);});
-    })();
-
-
     // ── Depoimentos: colunas com scroll infinito ───────────
     (function() {
       var cols = [
@@ -4385,7 +4598,7 @@
           line2: 'ALTO PADRÃO',
           subtitle: 'Projeto Arquitetônico Residencial',
           desc: 'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.',
-          img: 'imagens/residencial_00_sem_fundo.png',
+          img: 'imagens/residencial_03.png?v=2',
           m1: '320m²', m2: '3 dias', m3: '4X MAIS',
           badge: 'Residencial',
           glow: '#1D6FA8'
@@ -4611,6 +4824,29 @@
       applyContent(PROJECTS[0]);
       resetAutoplay();
 
+      // Botões mobile prev/next
+      var mobPrev  = document.getElementById('ts-mob-prev');
+      var mobNext  = document.getElementById('ts-mob-next');
+      var mobLabel = document.getElementById('ts-mob-label');
+
+      function updateMobLabel() {
+        if (mobLabel) mobLabel.textContent = PROJECTS[current].badge || PROJECTS[current].line1;
+      }
+      updateMobLabel();
+
+      var _origGoTo = goTo;
+      goTo = function(index, skipAnim) {
+        _origGoTo(index, skipAnim);
+        updateMobLabel();
+      };
+
+      if (mobPrev) mobPrev.addEventListener('click', function() {
+        goTo((current - 1 + PROJECTS.length) % PROJECTS.length);
+      });
+      if (mobNext) mobNext.addEventListener('click', function() {
+        goTo((current + 1) % PROJECTS.length);
+      });
+
       // Pause on hover
       if (section) {
         section.addEventListener('mouseenter', function() { clearTimeout(autoTimer); progressBar && (progressBar.style.transition = 'none'); });
@@ -4696,7 +4932,7 @@
       if (!grid) return;
 
       var items      = grid.querySelectorAll('.galeria-item');
-      var perPage    = window.innerWidth <= 640 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+      var perPage    = window.innerWidth <= 768 ? 1 : 3;
       var total      = items.length;
       var pages      = Math.ceil(total / perPage);
       var current    = 0;
@@ -4747,7 +4983,7 @@
       if (!grid) return;
 
       var items   = grid.querySelectorAll('.galeria-item');
-      var perPage = window.innerWidth <= 640 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+      var perPage = window.innerWidth <= 768 ? 1 : 3;
       var total   = items.length;
       var pages   = Math.ceil(total / perPage);
       var current = 0;
@@ -4975,40 +5211,31 @@
     canvas.parentElement.style.position = 'relative';
     canvas.parentElement.appendChild(overlay);
 
-    /* ── Renderer ────────────────────────────────────── */
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    /* ── Renderer — fundo transparente, sem halos ── */
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 1);
+    renderer.setClearColor(0x000000, 0);
     renderer.shadowMap.enabled   = false;
     renderer.outputColorSpace    = THREE.SRGBColorSpace;
     renderer.toneMapping         = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
 
-    /* ── Cena / Câmera ──────────────────────────────────── */
+    /* ── Cena — fundo transparente ── */
     const scene  = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
     const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
 
-    /* ── Ambiente IBL desativado — usamos apenas luzes diretas ── */
-    scene.environment = null;
-
-    /* ── Iluminação calibrada para vertex-color GLB ── */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.08));
-
-    const sun = new THREE.DirectionalLight(0xfff4e0, 1.6);
-    sun.position.set(25, 50, 30);
-    sun.castShadow = false;
+    /* ── Iluminação para materiais PBR com textura ── */
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 3.0));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.0);
+    sun.position.set(5, 10, 7);
     scene.add(sun);
-
-    const fillLight = new THREE.DirectionalLight(0xb8d0ff, 0.7);
-    fillLight.position.set(-20, 20, -15);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.5);
-    rimLight.position.set(5, -5, -35);
-    scene.add(rimLight);
-
-    scene.add(new THREE.HemisphereLight(0x8ab0d8, 0x111122, 0.4));
+    const fill = new THREE.DirectionalLight(0xffffff, 1.0);
+    fill.position.set(-5, 5, -5);
+    scene.add(fill);
+    /* glow marrom atrás do modelo — pontual, confinado à cena */
+    const glowLight = new THREE.PointLight(0xb87840, 2.5, 80);
+    glowLight.position.set(0, -2, -10);
+    scene.add(glowLight);
 
     /* ── Helpers matemáticos ───────────────────────────────── */
     const getBox  = m  => new THREE.Box3().setFromObject(m);
@@ -5033,7 +5260,7 @@
       const fRad = camera.fov * Math.PI / 180;
       const dist = (maxD / 2) / Math.tan(fRad / 2) * 1.55;
       /* ângulo arquitetônico: 3/4 frontal-alto */
-      camera.position.set(ctr.x + dist * 0.68, ctr.y + dist * 0.52, ctr.z + dist * 0.76);
+      camera.position.set(ctr.x + dist * 0.45, ctr.y + dist * 0.28, ctr.z + dist * 1.0);
       camera.lookAt(ctr);
       controls.target.copy(ctr);   /* OrbitControls: órbita em torno do centro */
       controls.update();
@@ -5069,42 +5296,12 @@
       hint.textContent   = '⟳ Carregando modelo 3D...';
     }
 
-    /* ── Materiais PBR por categoria (vertex-color GLB) ──────── */
-    const CAT_PBR = {
-      glass:    { roughness: 0.04, metalness: 0.10, transparent: true,  opacity: 0.55 },
-      metal:    { roughness: 0.30, metalness: 0.80, transparent: false, opacity: 1.0  },
-      wood:     { roughness: 0.85, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      concrete: { roughness: 0.92, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      brick:    { roughness: 0.88, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      tile:     { roughness: 0.35, metalness: 0.02, transparent: false, opacity: 1.0  },
-      grass:    { roughness: 0.95, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      road:     { roughness: 0.90, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      sidewalk: { roughness: 0.90, metalness: 0.0,  transparent: false, opacity: 1.0  },
-      default:  { roughness: 0.80, metalness: 0.0,  transparent: false, opacity: 1.0  },
-    };
-    const matCache = {};
-    function getMat(cat) {
-      if (matCache[cat]) return matCache[cat];
-      const p = CAT_PBR[cat] || CAT_PBR.default;
-      matCache[cat] = new THREE.MeshStandardMaterial({
-        vertexColors: true,
-        roughness:    p.roughness,
-        metalness:    p.metalness,
-        transparent:  p.transparent,
-        opacity:      p.opacity,
-        depthWrite:   !p.transparent,
-        side:         THREE.DoubleSide,
-        envMapIntensity: 0,
-      });
-      return matCache[cat];
-    }
-
-    /* ── Carrega GLB com vertex colors (residencial_definitivo.glb) ── */
+    /* ── Carrega GLB com texturas PBR embutidas ── */
     const loader = new GLTFLoader();
     let ifcModel;
     try {
       const gltf = await new Promise((res, rej) =>
-        loader.load('3D/residencial_definitivo.glb', res, undefined, rej)
+        loader.load('3D/exemplo_3d.glb', res, undefined, rej)
       );
       ifcModel = gltf.scene;
     } catch (err) {
@@ -5113,25 +5310,9 @@
       return;
     }
 
-    /* Corrige orientação IFC (Z-up → Y-up) */
-    ifcModel.rotation.x = -Math.PI / 2;
-    ifcModel.rotation.z = Math.PI;
-    ifcModel.updateMatrixWorld(true);
-
-    /* Oculta pilares/base subterrâneos */
-    const globalBox = new THREE.Box3().setFromObject(ifcModel);
-    const modelMinY = globalBox.min.y;
-    const pillarThreshold = modelMinY + (globalBox.max.y - modelMinY) * 0.15;
-
-    /* Aplica materiais PBR por categoria (nome do mesh: base_concrete → concrete) */
     ifcModel.traverse(c => {
       if (!c.isMesh) return;
-      const meshBox = new THREE.Box3().setFromObject(c);
-      if (meshBox.max.y < pillarThreshold) { c.visible = false; return; }
       if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
-      const meshName = c.name || (c.parent && c.parent.name) || '';
-      const cat = meshName.split('_')[1] || 'default';
-      c.material = getMat(CAT_PBR[cat] ? cat : 'default');
     });
 
     /* Centraliza o modelo inteiro */
