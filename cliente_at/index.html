@@ -1736,6 +1736,10 @@
       transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease;
       box-shadow: none;
     }
+    .ts-img.ts-img-comercial {
+      transform: translateY(30px) scale(1.18);
+      transform-origin: center top;
+    }
 
     .ts-img-wrap.ts-transitioning .ts-img {
       opacity: 0;
@@ -4709,6 +4713,7 @@
           subtitle: 'Arquitetura Corporativa',
           desc: 'Desenvolvimento completo de empreendimento comercial, integrando todas as disciplinas em modelo federado com análise de interferências e quantitativos precisos.',
           img: 'imagens/comercial_opcao.jpeg',
+          imgClass: 'ts-img-comercial',
           m1: '580m²', m2: '90 dias', m3: '4X MAIS',
           badge: 'Comercial',
           glow: '#D2B496'
@@ -4869,6 +4874,8 @@
         animateMetric(el.m3, p.m3, 1600, true);
         if (badgeText)  badgeText.textContent  = p.badge;
         setGlow(p.glow);
+        // Aplica classe de ajuste visual por projeto
+        mainImg.className = 'ts-img' + (p.imgClass ? ' ' + p.imgClass : '');
       }
 
       function startProgress() {
