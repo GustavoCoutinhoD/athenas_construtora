@@ -1626,6 +1626,33 @@
     .ts-mobile-nav {
       display: none;
     }
+
+    .ts-img-toggle {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .ts-img-toggle-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.55);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 7px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.25s, border-color 0.25s, color 0.25s;
+    }
+    .ts-img-toggle-btn.active,
+    .ts-img-toggle-btn:hover {
+      background: rgba(255,255,255,0.14);
+      border-color: var(--ts-glow, #1D6FA8);
+      color: #fff;
+    }
     @media (max-width: 1024px) {
       .ts-mobile-nav {
         display: flex;
@@ -3614,6 +3641,12 @@
           <div class="ts-img-frame"></div>
         </div>
 
+        <!-- Alternância de imagem Residencial -->
+        <div class="ts-img-toggle" id="ts-img-toggle" style="display:none;">
+          <button class="ts-img-toggle-btn active" id="ts-toggle-0" onclick="tsToggleImg(0)">Vista 1</button>
+          <button class="ts-img-toggle-btn" id="ts-toggle-1" onclick="tsToggleImg(1)">Vista 2</button>
+        </div>
+
         <!-- Navegação mobile entre projetos -->
         <div class="ts-mobile-nav" id="ts-mobile-nav">
           <button class="ts-mob-btn" id="ts-mob-prev" aria-label="Anterior">
@@ -4614,6 +4647,7 @@
           subtitle: 'Projeto Arquitetônico Residencial',
           desc: 'Projeto arquitetônico completo com compatibilização BIM, modelagem 3D fotorrealista e projetos executivos detalhados para residência de alto padrão.',
           img: 'imagens/residencial_00_sem_fundo.webp',
+          imgs: ['imagens/residencial_00_sem_fundo.webp', 'imagens/residencial_part_02.png'],
           m1: '320m²', m2: '3 dias', m3: '4X MAIS',
           badge: 'Residencial',
           glow: '#1D6FA8'
@@ -4678,6 +4712,21 @@
       var progressBar = document.getElementById('ts-progress-bar');
       var counterWrap = document.getElementById('ts-counter');
       var navItems  = document.querySelectorAll('.ts-nav-item');
+      var imgToggle = document.getElementById('ts-img-toggle');
+      var subImgIndex = 0;
+
+      window.tsToggleImg = function(idx) {
+        var proj = PROJECTS[0];
+        if (!proj.imgs) return;
+        subImgIndex = idx;
+        imgWrap.classList.add('ts-transitioning');
+        setTimeout(function() {
+          mainImg.src = proj.imgs[idx];
+          setTimeout(function() { imgWrap.classList.remove('ts-transitioning'); }, 80);
+        }, 200);
+        document.getElementById('ts-toggle-0').classList.toggle('active', idx === 0);
+        document.getElementById('ts-toggle-1').classList.toggle('active', idx === 1);
+      };
 
       var el = {
         eyebrow: document.getElementById('ts-eyebrow'),
@@ -4807,7 +4856,15 @@
 
         setTimeout(function() {
           applyContent(PROJECTS[index]);
+          subImgIndex = 0;
           mainImg.src = PROJECTS[index].img;
+          if (imgToggle) {
+            imgToggle.style.display = (index === 0 && PROJECTS[0].imgs) ? 'flex' : 'none';
+            var b0 = document.getElementById('ts-toggle-0');
+            var b1 = document.getElementById('ts-toggle-1');
+            if (b0) b0.classList.add('active');
+            if (b1) b1.classList.remove('active');
+          }
 
           setTimeout(function() {
             imgWrap.classList.remove('ts-transitioning');
@@ -4837,6 +4894,7 @@
 
       // Init
       applyContent(PROJECTS[0]);
+      if (imgToggle && PROJECTS[0].imgs) imgToggle.style.display = 'flex';
       resetAutoplay();
 
       // Botões mobile prev/next
