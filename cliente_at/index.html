@@ -2054,13 +2054,17 @@
       width: 100%;
       max-width: 520px;
       margin: 60px auto 0;
+      transition: max-width 0.8s ease;
+    }
+    .bim-img-wrap.showing-2 {
+      max-width: 760px;
     }
     .bim-img {
       display: block;
       width: 100%;
       height: auto;
       opacity: 0;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.8s ease;
       position: absolute;
       top: 0; left: 0;
     }
@@ -5278,17 +5282,43 @@
     })();
 
     // ── BIM: alternância de imagens ──────────────────────────
-    window.bimToggle = function(n) {
-      var img1 = document.getElementById('bim-img-1');
-      var img2 = document.getElementById('bim-img-2');
-      var btn1 = document.getElementById('bim-btn-1');
-      var btn2 = document.getElementById('bim-btn-2');
-      if (!img1 || !img2) return;
-      img1.classList.toggle('active', n === 1);
-      img2.classList.toggle('active', n === 2);
-      btn1.classList.toggle('active', n === 1);
-      btn2.classList.toggle('active', n === 2);
-    };
+    (function() {
+      var bimAutoTimer = null;
+      var bimTriggered = false;
+
+      window.bimToggle = function(n) {
+        var wrap = document.getElementById('bim-img-wrap');
+        var img1 = document.getElementById('bim-img-1');
+        var img2 = document.getElementById('bim-img-2');
+        var btn1 = document.getElementById('bim-btn-1');
+        var btn2 = document.getElementById('bim-btn-2');
+        if (!img1 || !img2) return;
+        img1.classList.toggle('active', n === 1);
+        img2.classList.toggle('active', n === 2);
+        if (wrap) wrap.classList.toggle('showing-2', n === 2);
+        if (btn1) btn1.classList.toggle('active', n === 1);
+        if (btn2) btn2.classList.toggle('active', n === 2);
+      };
+
+      // Auto-switch para Vista 2 após 5 segundos ao entrar na seção
+      var bimSection = document.getElementById('bim');
+      if (bimSection) {
+        var obs = new IntersectionObserver(function(entries) {
+          if (entries[0].isIntersecting && !bimTriggered) {
+            bimTriggered = true;
+            bimAutoTimer = setTimeout(function() {
+              window.bimToggle(2);
+            }, 5000);
+          } else if (!entries[0].isIntersecting) {
+            // Reseta ao sair da seção para repetir na próxima visita
+            clearTimeout(bimAutoTimer);
+            bimTriggered = false;
+            window.bimToggle(1);
+          }
+        }, { threshold: 0.3 });
+        obs.observe(bimSection);
+      }
+    })();
 
   </script>
 
