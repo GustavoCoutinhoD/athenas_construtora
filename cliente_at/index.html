@@ -2057,7 +2057,7 @@
       transition: max-width 0.8s ease;
     }
     .bim-img-wrap.showing-2 {
-      max-width: 760px;
+      max-width: 960px;
     }
     .bim-img {
       display: block;
@@ -4052,10 +4052,6 @@
               <img class="bim-img active" id="bim-img-1" src="imagens/predio_BIM_1_sem_fundo.webp" alt="Projeto BIM ATHENAS - Vista 1" loading="lazy">
               <img class="bim-img" id="bim-img-2" src="imagens/predio_BIM_2_sem_fundo.webp" alt="Projeto BIM ATHENAS - Vista 2" loading="lazy">
             </div>
-            <div class="bim-img-toggle">
-              <button class="bim-img-btn active" id="bim-btn-1" onclick="bimToggle(1)">Vista 1</button>
-              <button class="bim-img-btn" id="bim-btn-2" onclick="bimToggle(2)">Vista 2</button>
-            </div>
           </div>
 
         </div>
@@ -5308,7 +5304,7 @@
             bimTriggered = true;
             bimAutoTimer = setTimeout(function() {
               window.bimToggle(2);
-            }, 5000);
+            }, 4000);
           } else if (!entries[0].isIntersecting) {
             // Reseta ao sair da seção para repetir na próxima visita
             clearTimeout(bimAutoTimer);
