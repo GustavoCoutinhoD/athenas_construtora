@@ -2048,6 +2048,51 @@
 
     #lightbox-close:hover { background: var(--gold); }
 
+    /* ─── BIM IMAGES ────────────────────────────────────────── */
+    .bim-img-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      margin: 60px auto 0;
+    }
+    .bim-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .bim-img:first-child { position: relative; }
+    .bim-img.active { opacity: 1; }
+    .bim-img-toggle {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    .bim-img-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.55);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 7px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.25s, border-color 0.25s, color 0.25s;
+    }
+    .bim-img-btn.active,
+    .bim-img-btn:hover {
+      background: rgba(255,255,255,0.14);
+      border-color: var(--gold, #C89B3C);
+      color: #fff;
+    }
+
     /* ─── BIM ───────────────────────────────────────────────── */
     #bim {
       background: var(--light);
@@ -3997,13 +4042,16 @@
 
           </div>
 
-          <!-- 3D BIM -->
-          <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:stretch;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
-            <div class="bim-canvas-wrap" style="margin-left:160px;margin-right:60px;margin-top:125px;width:calc(100% - 220px);position:relative;background:transparent;">
-              <canvas id="bim-3d-canvas" style="height:600px;display:block;width:100%;cursor:crosshair;background:transparent;outline:none;border:none;vertical-align:bottom;"></canvas>
+          <!-- BIM Visual -->
+          <div class="bim-visual reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;position:sticky;top:80px;align-self:start;margin-right:0;">
+            <div class="bim-img-wrap" id="bim-img-wrap">
+              <img class="bim-img active" id="bim-img-1" src="imagens/predio_BIM_1_sem_fundo.webp" alt="Projeto BIM ATHENAS - Vista 1" loading="lazy">
+              <img class="bim-img" id="bim-img-2" src="imagens/predio_BIM_2_sem_fundo.webp" alt="Projeto BIM ATHENAS - Vista 2" loading="lazy">
             </div>
-            <p id="bim-mouse-hint" style="margin-top:12px;margin-left:60px;font-size:11px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;color:rgba(100,80,50,0.7);text-align:center;pointer-events:none;">🖱 Utilize os botões do mouse na imagem 3D</p>
-            <div id="bim-3d-hint" style="margin-top:6px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);pointer-events:none;text-align:center;">⏬ Role o scroll para explodir</div>
+            <div class="bim-img-toggle">
+              <button class="bim-img-btn active" id="bim-btn-1" onclick="bimToggle(1)">Vista 1</button>
+              <button class="bim-img-btn" id="bim-btn-2" onclick="bimToggle(2)">Vista 2</button>
+            </div>
           </div>
 
         </div>
@@ -5229,254 +5277,23 @@
 
     })();
 
+    // ── BIM: alternância de imagens ──────────────────────────
+    window.bimToggle = function(n) {
+      var img1 = document.getElementById('bim-img-1');
+      var img2 = document.getElementById('bim-img-2');
+      var btn1 = document.getElementById('bim-btn-1');
+      var btn2 = document.getElementById('bim-btn-2');
+      if (!img1 || !img2) return;
+      img1.classList.toggle('active', n === 1);
+      img2.classList.toggle('active', n === 2);
+      btn1.classList.toggle('active', n === 1);
+      btn2.classList.toggle('active', n === 2);
+    };
+
   </script>
 
-  <!-- ── Globo BIM: ES module, lazy + pausa quando invisível ── -->
 
 
-  <!-- ══ 3D RESIDENCIAL — Import Map ══════════════════════════ -->
-  <!-- Globo BIM + 3D Residencial compartilham o mesmo Three.js via importmap -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-
-
-  <!-- ══ 3D BIM — GLB (convertido do IFC Revit) ══════════════ -->
-  <script type="module">
-  import * as THREE          from 'three';
-  import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
-  import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
-
-  /* ── Só inicializa quando o canvas BIM entrar na tela ── */
-  const _triggerEl = document.getElementById('bim-3d-canvas');
-  if (_triggerEl) {
-    const _obs = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting) {
-        _obs.disconnect();
-        initBim3D();
-      }
-    }, { rootMargin: '300px' });
-    _obs.observe(_triggerEl);
-  }
-
-  async function initBim3D() {
-
-    const canvas = document.getElementById('bim-3d-canvas');
-    const hint   = document.getElementById('bim-3d-hint');
-    if (!canvas) return;
-
-    /* ── Overlay de transição (fade entre modos) ──────────── */
-    const overlay = document.createElement('div');
-    overlay.style.cssText = [
-      'position:absolute', 'inset:0',
-      'background:rgba(6,8,16,0.97)',
-      'border-radius:16px',
-      'opacity:0',
-      'pointer-events:none',
-      'z-index:6',
-      'transition:none'
-    ].join(';');
-    canvas.parentElement.style.position = 'relative';
-    canvas.parentElement.appendChild(overlay);
-
-    /* ── Renderer — fundo transparente, sem halos ── */
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    renderer.shadowMap.enabled   = false;
-    renderer.outputColorSpace    = THREE.SRGBColorSpace;
-    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
-
-    /* ── Cena — fundo transparente ── */
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 5000);
-
-    /* ── Iluminação para materiais PBR com textura ── */
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 3.0));
-    const sun = new THREE.DirectionalLight(0xffffff, 2.0);
-    sun.position.set(5, 10, 7);
-    scene.add(sun);
-    const fill = new THREE.DirectionalLight(0xffffff, 1.0);
-    fill.position.set(-5, 5, -5);
-    scene.add(fill);
-    /* glow marrom atrás do modelo — pontual, confinado à cena */
-    const glowLight = new THREE.PointLight(0xb87840, 2.5, 80);
-    glowLight.position.set(0, -2, -10);
-    scene.add(glowLight);
-
-    /* ── Helpers matemáticos ───────────────────────────────── */
-    const getBox  = m  => new THREE.Box3().setFromObject(m);
-    const getSize = b  => { const v = new THREE.Vector3(); b.getSize(v); return v; };
-    const getCtr  = b  => { const v = new THREE.Vector3(); b.getCenter(v); return v; };
-    const lerp    = (a, b, t) => a + (b - a) * t;
-
-    function easeInOut(t) { return t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t; }
-    function easeOut(t)   { return 1 - (1-t)*(1-t); }
-
-    function centerXZ(m) {
-      const c = getCtr(getBox(m));
-      m.position.x -= c.x;
-      m.position.z -= c.z;
-    }
-
-    function fitCamera(model) {
-      const box  = getBox(model);
-      const size = getSize(box);
-      const ctr  = getCtr(box);
-      const maxD = Math.max(size.x, size.y, size.z);
-      const fRad = camera.fov * Math.PI / 180;
-      const dist = (maxD / 2) / Math.tan(fRad / 2) * 1.55;
-      /* ângulo arquitetônico: 3/4 frontal-alto */
-      camera.position.set(ctr.x + dist * 0.45, ctr.y + dist * 0.28, ctr.z + dist * 1.0);
-      camera.lookAt(ctr);
-      controls.target.copy(ctr);   /* OrbitControls: órbita em torno do centro */
-      controls.update();
-      return { dist, maxD, ctr };
-    }
-
-    /* ── Animação genérica baseada em tempo ─────────────────────── */
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-    function animateValue(from, to, duration, onUpdate, easeFn) {
-      easeFn = easeFn || easeInOut;
-      return new Promise(function(resolve) {
-        var start = performance.now();
-        function step() {
-          var raw = Math.min(1, (performance.now() - start) / duration);
-          onUpdate(lerp(from, to, easeFn(raw)));
-          if (raw < 1) requestAnimationFrame(step);
-          else resolve();
-        }
-        requestAnimationFrame(step);
-      });
-    }
-
-    /* fade do overlay: 0 = transparente, 1 = escuro */
-    function fadeOverlay(from, to, ms) {
-      return animateValue(from, to, ms, function(v) { overlay.style.opacity = v; });
-    }
-
-    /* ── Hint de carregamento ─────────────────────────────── */
-    if (hint) {
-      hint.style.display = 'flex';
-      hint.style.opacity = '0.55';
-      hint.textContent   = '⟳ Carregando modelo 3D...';
-    }
-
-    /* ── Carrega GLB com texturas PBR embutidas ── */
-    const loader = new GLTFLoader();
-    let ifcModel;
-    try {
-      const gltf = await new Promise((res, rej) =>
-        loader.load('3D/exemplo_3d.glb', res, undefined, rej)
-      );
-      ifcModel = gltf.scene;
-    } catch (err) {
-      console.error('[3D GLB] Falha ao carregar:', err);
-      if (hint) { hint.textContent = '✕ Erro ao carregar modelo'; }
-      return;
-    }
-
-    ifcModel.traverse(c => {
-      if (!c.isMesh) return;
-      if (!c.geometry.attributes.normal) c.geometry.computeVertexNormals();
-    });
-
-    /* Centraliza o modelo inteiro */
-    centerXZ(ifcModel);
-    const groupA = new THREE.Group();
-    groupA.add(ifcModel);
-    const gcA = getCtr(getBox(groupA));
-    groupA.position.y -= gcA.y;
-    scene.add(groupA);
-
-    let visible = false;
-    let rafId   = null;
-
-    /* ── OrbitControls — câmera orbita ao redor do modelo ─── */
-    const controls = new OrbitControls(camera, canvas);
-    controls.enableDamping   = true;
-    controls.dampingFactor   = 0.07;
-    controls.autoRotate      = true;
-    controls.autoRotateSpeed = 0.55;     /* rotação lenta e elegante */
-    controls.enablePan       = false;
-    controls.enableZoom      = false;  /* scroll agora controla explosão de partículas */
-    controls.minDistance     = 3;
-    controls.maxDistance     = 600;
-    controls.minPolarAngle   = 0.18;     /* não vai abaixo do solo */
-    controls.maxPolarAngle   = 1.38;
-    canvas.style.cursor      = 'grab';
-
-    /* Pausa auto-rotate durante interação */
-    controls.addEventListener('start', () => { controls.autoRotate = false; canvas.style.cursor = 'grabbing'; });
-    controls.addEventListener('end',   () => { controls.autoRotate = true; canvas.style.cursor = 'grab'; });
-
-    /* Botão direito do mouse também orbita (em vez de fazer pan) */
-    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
-    canvas.addEventListener('contextmenu', e => e.preventDefault());
-
-    /* ── helper: atualiza texto do hint com fade ───────────────── */
-    function setHint(txt) {
-      if (!hint) return;
-      hint.style.transition = 'opacity 0.3s ease';
-      hint.style.opacity = '0';
-      setTimeout(function() {
-        hint.textContent  = txt;
-        hint.style.opacity = '0.55';
-      }, 350);
-    }
-
-    /* ══════════════════════════════════════════════════════════
-       SCROLL → EXPLOSÃO DE PARTÍCULAS
-    ══════════════════════════════════════════════════════════ */
-
-
-    /* ── Resize ──────────────────────────────────────────── */
-    function resize() {
-      const w = canvas.offsetWidth, h = canvas.offsetHeight;
-      if (!w || !h) return;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-
-    /* ── Render loop ───────────────────────────────────────── */
-    function tick() {
-      rafId = requestAnimationFrame(tick);
-      if (!visible) return;
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    /* ── Inicia ──────────────────────────────────────────────── */
-    fitCamera(groupA);
-    resize();
-    if (hint) {
-      hint.style.opacity = '0.55';
-      hint.textContent   = '🖱 Arraste para girar · Btn. direito para mover';
-    }
-    visible = true;
-    tick();
-
-    /* ── Pausa quando fora da tela ou aba oculta ─────────────── */
-    new IntersectionObserver(function(entries) {
-      visible = entries[0].isIntersecting && !document.hidden;
-    }, { threshold: 0.05 }).observe(canvas);
-
-    document.addEventListener('visibilitychange', function() {
-      visible = !document.hidden;
-    });
-
-    window.addEventListener('resize', resize);
-
-  }
-  </script>
 
 
 
