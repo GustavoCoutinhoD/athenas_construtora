@@ -58,6 +58,8 @@
   <meta name="twitter:image" content="https://athenasconstrutora.com.br/imagens/background_header.jpg">
 
   <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="imagens/favicon.svg?v=6">
+  <link rel="icon" type="image/png" sizes="180x180" href="imagens/apple-touch-icon.png">
   <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="imagens/apple-touch-icon.png">
 
@@ -369,11 +371,12 @@
       background: linear-gradient(
         to right,
         #0a0a0a 0%,
-        #0a0a0a 38%,
-        rgba(10,10,10,0.92) 55%,
-        rgba(10,10,10,0.60) 72%,
-        rgba(10,10,10,0.15) 88%,
-        rgba(10,10,10,0) 100%
+        #0a0a0a 32%,
+        rgba(10,10,10,0.90) 42%,
+        rgba(10,10,10,0.70) 52%,
+        rgba(10,10,10,0.45) 63%,
+        rgba(10,10,10,0.18) 75%,
+        rgba(10,10,10,0) 88%
       );
       z-index: 1;
     }
@@ -1532,7 +1535,7 @@
       display: flex;
       gap: 14px;
       margin-top: 32px;
-      margin-left: 10%;
+      margin-left: 18%;
       width: 75%;
       opacity: 0;
       transform: translateY(12px);
@@ -1628,10 +1631,15 @@
     }
 
     .ts-img-toggle {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       gap: 8px;
       justify-content: center;
-      margin-top: 14px;
+      z-index: 5;
+      white-space: nowrap;
     }
     .ts-img-toggle-btn {
       background: rgba(255,255,255,0.07);
@@ -3695,12 +3703,11 @@
           <canvas id="ts-3d-canvas"></canvas>
           <div class="ts-img-glow" id="ts-img-glow"></div>
           <div class="ts-img-frame"></div>
-        </div>
-
-        <!-- Alternância de imagem Residencial -->
-        <div class="ts-img-toggle" id="ts-img-toggle" style="display:none;">
-          <button class="ts-img-toggle-btn active" id="ts-toggle-0" onclick="tsToggleImg(0)">Vista 1</button>
-          <button class="ts-img-toggle-btn" id="ts-toggle-1" onclick="tsToggleImg(1)">Vista 2</button>
+          <!-- Alternância de imagem Residencial -->
+          <div class="ts-img-toggle" id="ts-img-toggle" style="display:none;">
+            <button class="ts-img-toggle-btn active" id="ts-toggle-0" onclick="tsToggleImg(0)">Vista 1</button>
+            <button class="ts-img-toggle-btn" id="ts-toggle-1" onclick="tsToggleImg(1)">Vista 2</button>
+          </div>
         </div>
 
         <!-- Navegação mobile entre projetos -->
@@ -4303,7 +4310,7 @@
       <div class="footer-top">
 
         <div class="footer-brand">
-          <a href="#" class="logo" style="display:flex;align-items:center;gap:14px;">
+          <a href="#" class="logo" style="display:flex;flex-direction:row;align-items:center;gap:14px;margin-left:-22px;">
             <img src="imagens/athenas_sem_fundo.webp" alt="ATHENAS Construtora - Arquitetura, BIM e Projetos em São Paulo" style="height:52px;width:auto;object-fit:contain;display:block;" loading="lazy">
             <div class="logo-text">
               <span class="logo-name">ATHENAS</span>
@@ -4311,11 +4318,11 @@
             </div>
           </a>
           <p class="footer-desc">
-            Especialistas em projetos residenciais e compatibilização BIM. Transformamos ideias em espaços excepcionais com precisão técnica e visão criativa.
+            Especialistas em projetos residenciais, comerciais, edifícios, e compatibilização BIM. Transformamos ideias em espaços excepcionais com precisão técnica e visão criativa.
           </p>
           <div class="footer-social">
             <!-- Instagram -->
-            <a href="#" class="social-link" aria-label="Instagram">
+            <a href="https://www.instagram.com/athenas_construtora" class="social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
             </a>
             <!-- LinkedIn -->
@@ -4366,7 +4373,7 @@
 
       <div class="footer-bottom">
         <p class="footer-copy">© 2026 ATHENAS Projetos & Compatibilização BIM. Todos os direitos reservados.</p>
-        <p class="footer-credits">CRECI/CAU registrado · Desenvolvido com ♡</p>
+        <p class="footer-credits">Desenvolvido por VERIDION COMPANY</p>
       </div>
     </div>
   </footer>
