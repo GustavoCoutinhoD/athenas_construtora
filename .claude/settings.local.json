@@ -19,7 +19,15 @@
       "Bash(Remove-Item \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\\\\_patch_3d.py\" -Force)",
       "PowerShell(Start-Process python -ArgumentList '-m', 'http.server', '8080' -WorkingDirectory \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\")",
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing)",
-      "PowerShell(cd \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\"; Start-Process python -ArgumentList \"-m\", \"http.server\", \"8080\" -WindowStyle Hidden; Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing\\).StatusCode)"
+      "PowerShell(cd \"c:\\\\Users\\\\Gustavo Coutinho\\\\OneDrive\\\\Documentos\\\\Cliente_nathan\\\\cliente_at\"; Start-Process python -ArgumentList \"-m\", \"http.server\", \"8080\" -WindowStyle Hidden; Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing\\).StatusCode)",
+      "Bash(npx serve *)",
+      "Bash(git pull *)",
+      "PowerShell(Test-NetConnection -ComputerName localhost -Port 3000 2>&1)",
+      "PowerShell(Get-ChildItem \"c:\\\\a\\\\athenas definitivo\\\\cliente_at\\\\imagens\" | Select-Object Name, @{N='KB';E={[math]::Round\\($_.Length/1KB,0\\)}} | Sort-Object KB -Descending)",
+      "PowerShell(Get-ChildItem \"c:\\\\a\\\\athenas definitivo\\\\cliente_at\\\\3D\" | Select-Object Name, @{N='MB';E={[math]::Round\\($_.Length/1MB,2\\)}})",
+      "Bash(powershell -command \"\\(Get-Item 'c:\\\\a\\\\athenas definitivo\\\\cliente_at\\\\index.html'\\).Length / 1KB\")",
+      "PowerShell(python -c \"from PIL import Image; print\\('Pillow OK'\\)\" 2>&1)",
+      "Bash(git add *)"
     ]
   }
 }
