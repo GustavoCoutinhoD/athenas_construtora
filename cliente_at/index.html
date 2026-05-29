@@ -2054,21 +2054,23 @@
       width: 100%;
       max-width: 520px;
       margin: 60px auto 0;
-      transition: max-width 0.8s ease;
-    }
-    .bim-img-wrap.showing-2 {
-      max-width: 960px;
     }
     .bim-img {
       display: block;
       width: 100%;
       height: auto;
       opacity: 0;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.8s ease, transform 0.8s ease;
       position: absolute;
       top: 0; left: 0;
+      transform: scale(1);
+      transform-origin: center top;
     }
     .bim-img:first-child { position: relative; }
+    .bim-img#bim-img-2.active {
+      transform: scale(1.9);
+      transform-origin: center top;
+    }
     .bim-img.active { opacity: 1; }
     .bim-img-toggle {
       display: flex;
@@ -5279,37 +5281,38 @@
 
     // ── BIM: alternância de imagens ──────────────────────────
     (function() {
-      var bimAutoTimer = null;
+      var bimTimer = null;
       var bimTriggered = false;
 
-      window.bimToggle = function(n) {
-        var wrap = document.getElementById('bim-img-wrap');
+      function bimShow(n) {
         var img1 = document.getElementById('bim-img-1');
         var img2 = document.getElementById('bim-img-2');
-        var btn1 = document.getElementById('bim-btn-1');
-        var btn2 = document.getElementById('bim-btn-2');
         if (!img1 || !img2) return;
         img1.classList.toggle('active', n === 1);
         img2.classList.toggle('active', n === 2);
-        if (wrap) wrap.classList.toggle('showing-2', n === 2);
-        if (btn1) btn1.classList.toggle('active', n === 1);
-        if (btn2) btn2.classList.toggle('active', n === 2);
-      };
+      }
 
-      // Auto-switch para Vista 2 após 5 segundos ao entrar na seção
+      function bimLoop() {
+        // Mostra img2 após 4s, volta para img1 após mais 3s, repete
+        bimTimer = setTimeout(function() {
+          bimShow(2);
+          bimTimer = setTimeout(function() {
+            bimShow(1);
+            bimLoop();
+          }, 3000);
+        }, 4000);
+      }
+
       var bimSection = document.getElementById('bim');
       if (bimSection) {
         var obs = new IntersectionObserver(function(entries) {
           if (entries[0].isIntersecting && !bimTriggered) {
             bimTriggered = true;
-            bimAutoTimer = setTimeout(function() {
-              window.bimToggle(2);
-            }, 4000);
+            bimLoop();
           } else if (!entries[0].isIntersecting) {
-            // Reseta ao sair da seção para repetir na próxima visita
-            clearTimeout(bimAutoTimer);
+            clearTimeout(bimTimer);
             bimTriggered = false;
-            window.bimToggle(1);
+            bimShow(1);
           }
         }, { threshold: 0.3 });
         obs.observe(bimSection);
